@@ -1,0 +1,29 @@
+{
+  "manifest_version": 2,
+
+  "name": "password manager",
+  "description": "This extension fetches a passwords from a google spreadsheet api",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "assets/icon.png",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "page": "background.html",
+    "persistent": false
+  },
+  "permissions": [
+    "tabs",
+    "https://*.google.com/*",
+    "https://docs.google.com/feeds/*",
+    "https://spreadsheets.google.com/feeds/*",
+    "https://www.google.com/accounts/OAuthGetRequestToken",
+    "https://www.google.com/accounts/OAuthAuthorizeToken",
+    "https://www.google.com/accounts/OAuthGetAccessToken"
+  ],
+  "content_security_policy": "script-src 'self' https://spreadsheets.google.com; object-src 'self'",
+  "web_accessible_resources":[
+    "chrome_ex_oauth.html"
+  ]
+}
