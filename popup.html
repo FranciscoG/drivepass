@@ -4,21 +4,26 @@
     <title>Getting Started Extension's Popup</title>
     <style>
       body {
-        min-width: 200px;
+        width: 200px;
         overflow-x: hidden;
         height:auto;
       }
-      input {
+      span {
         display:block;
         font-size: 14px;
         padding:5px;
+        height:30px;
         border:1px solid #c8c8c8;
         color:#aaa;
-        box-sizing:border-box;
         width:100%;
+        box-sizing:border-box;
       }
       #pw {
-        color:#eee;
+        color:#efefef;
+      }
+      #pw::selection {
+        color:#fff;
+        background: #fff;
       }
     </style>
 
@@ -27,8 +32,8 @@
     <script src="libs/popup.js"></script>
   </head>
   <body>
-    <input type="text" id="un" />
-    <input type="text" id="pw" />
+    <span id="un"></span>
+    <span id="pw"></span>
   </body>
 </html>
 

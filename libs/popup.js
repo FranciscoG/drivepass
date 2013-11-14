@@ -33,13 +33,31 @@ var util = {
       console.warn('findPW: data not an object');
     }
   }
+  getDomain : function(tabUrl){
+    if (tabUrl !== null) {
+      var tabDomain, finalDomain      
+      if (/http:/i.test(tabUrl)) { 
+        tabDomain = tabUrl.split('http://'); 
+      } else if (/https/i.test(tabUrl)) { 
+        tabDomain = tabUrl.split('https://'); 
+      }
+      finalDomain = tabDomain[1].split('/');
+      return finalDomain[0];
+    } else {
+      console.warn('getDomain: url is null');
+    }
+  }
 };
 
 var accessSheet = {
 
   init: function(){
-    //localStorage.clear();
-    var sample_url = "https://docs.google.com/spreadsheet/ccc?key=0AutNQyCIKVnndF9xRnpxbDJxRTJjaWRjSENPbXZvbVE&usp=sharing";
+    //localStorage.removeItem('GoogleSpreadsheet_data');
+    //public test spreadsheet:
+    //var sample_url = "https://docs.google.com/spreadsheet/ccc?key=0AutNQyCIKVnndF9xRnpxbDJxRTJjaWRjSENPbXZvbVE&usp=sharing";
+    //private test spreadsheet:
+    //var sample_url = "https://docs.google.com/spreadsheet/ccc?key=0AutNQyCIKVnndEdRRE5IUnhSOThQUTdXNmoxSGk1M1E#gid=0";
+    var sample_url = localStorage["sheet_url"];
     var url = sample_url;
     var googleSpreadsheet = new GoogleSpreadsheet();
     googleSpreadsheet.url(url);
@@ -49,19 +67,16 @@ var accessSheet = {
         active: true,
         lastFocusedWindow: true
       }, function(array_of_Tabs) {
-        var tabDomain,
-            plur,
-            tab = array_of_Tabs[0],
+        var tab = array_of_Tabs[0],
             tabUrl = tab.url;
-        if (/http:/i.test(tabUrl)) { tabDomain = tabUrl.split('http://'); }
+        
         else if (/https/i.test(tabUrl)) { tabDomain = tabUrl.split('https://'); }
         plur = tabDomain[1].split('/');
         var spreadSheetData = util.convertArray(result.data);
         var found = util.findPW(spreadSheetData,plur[0]);
-        $('#un').val(found[0]);
-        $('#pw').val(found[1]);
-      });      
-      //$('body').html(JSON.stringify(spreadSheetData,null,'\t'));
+        $('#un').text(found[0]);
+        $('#pw').text(found[1]);
+      });
     });
   },
 
