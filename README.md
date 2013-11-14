@@ -22,7 +22,9 @@ Your spreadsheet must be only 3 columns and they must be in this order:
 * col3 = password
 
 | site | username | password |
+
 | www.google.com | user123 | passwordX |
+
 | github.com | userB | passB |
 
 credits:
