@@ -10,8 +10,9 @@ var oauth = ChromeExOAuth.initBackgroundPage({
 
 
 function callback(resp, xhr) {
-  console.log(resp);
-};
+  docBody = document.getElementsByTagName('body');
+  docBody.innerHTML = resp;
+}
 
 function onAuthorized() {
   var url = 'https://spreadsheets.google.com/feeds/default/private/full';
@@ -22,6 +23,6 @@ function onAuthorized() {
 
   // Send: GET https://docs.google.com/feeds/default/private/full?alt=json
   oauth.sendSignedRequest(url, callback, request);
-};
+}
 
 oauth.authorize(onAuthorized);

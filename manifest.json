@@ -14,9 +14,10 @@
     "persistent": false
   },
   "permissions": [
-    "tabs",
+    "activeTab",
     "https://*.google.com/*",
     "https://docs.google.com/feeds/*",
+    "http://spreadsheets.google.com/feeds/*",
     "https://spreadsheets.google.com/feeds/*",
     "https://www.google.com/accounts/OAuthGetRequestToken",
     "https://www.google.com/accounts/OAuthAuthorizeToken",
