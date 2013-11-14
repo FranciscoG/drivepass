@@ -24,7 +24,9 @@ var util = {
     if (data !== null && typeof data === 'object') {
       for (prop in data) {
         if (data[prop].site === tabDomain) {
-          return data[prop].pw;
+          var result = [];
+          result.push(data[prop].u,data[prop].pw);
+          return result;
         }
       }
     } else {
@@ -56,7 +58,8 @@ var accessSheet = {
         plur = tabDomain[1].split('/');
         var spreadSheetData = util.convertArray(result.data);
         var found = util.findPW(spreadSheetData,plur[0]);
-        $('body').html(found);
+        $('#un').val(found[0]);
+        $('#pw').val(found[1]);
       });      
       //$('body').html(JSON.stringify(spreadSheetData,null,'\t'));
     });

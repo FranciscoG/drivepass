@@ -4,31 +4,31 @@
     <title>Getting Started Extension's Popup</title>
     <style>
       body {
-        min-width: 357px;
+        min-width: 200px;
         overflow-x: hidden;
         height:auto;
       }
-
-      img {
-        margin: 5px;
-        border: 2px solid black;
-        vertical-align: middle;
-        width: 75px;
-        height: 75px;
+      input {
+        display:block;
+        font-size: 14px;
+        padding:5px;
+        border:1px solid #c8c8c8;
+        color:#aaa;
+        box-sizing:border-box;
+        width:100%;
+      }
+      #pw {
+        color:#eee;
       }
     </style>
 
-    <!--
-      - JavaScript and HTML must be in separate files: see our Content Security
-      - Policy documentation[1] for details and explanation.
-      -
-      - [1]: http://developer.chrome.com/extensions/contentSecurityPolicy.html
-     -->
     <script src="libs/jquery-2.0.3.min.js"></script>
     <script src="libs/google-spreadsheet.js"></script>
     <script src="libs/popup.js"></script>
   </head>
-  <body id="results">
+  <body>
+    <input type="text" id="un" />
+    <input type="text" id="pw" />
   </body>
 </html>
 
