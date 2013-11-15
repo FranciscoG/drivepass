@@ -1,10 +1,9 @@
-var DOCLIST_SCOPE = 'https://spreadsheets.google.com/feeds';
-var DOCLIST_FEED = DOCLIST_SCOPE + '/default/private/full/';
-
 var bgPage = chrome.extension.getBackgroundPage();
 
-var util = {
-  convertArray : function(arr){
+var accessSheet = (function() {
+  var init,convertArray,findPW,getDomain,loadData;
+
+  convertArray = function(arr){
     if (arr !== null) {
       var a = 0, newObj = {};
       for (var i = 0; i < arr.length; i = i+3) {
@@ -19,11 +18,14 @@ var util = {
     } else {
       console.warn('convertArray: array is null');
     }
-  },
-  findPW : function(data,tabDomain) {
+  };
+  findPW = function(data,tabDomain) {
     if (data !== null && typeof data === 'object') {
       for (prop in data) {
-        if (data[prop].site === tabDomain) {
+        var currSite = getDomain(data[prop].site);
+        console.log(currSite);
+        console.log(tabDomain);
+        if (currSite === tabDomain) {
           var result = [];
           result.push(data[prop].u,data[prop].pw);
           return result;
@@ -32,57 +34,109 @@ var util = {
     } else {
       console.warn('findPW: data not an object');
     }
-  }
-  getDomain : function(tabUrl){
+  };
+  getDomain = function(tabUrl){
     if (tabUrl !== null) {
-      var tabDomain, finalDomain      
-      if (/http:/i.test(tabUrl)) { 
-        tabDomain = tabUrl.split('http://'); 
-      } else if (/https/i.test(tabUrl)) { 
-        tabDomain = tabUrl.split('https://'); 
+      var tabDomain,
+          finalDomain;
+      if (/http:/i.test(tabUrl)) {
+        tabDomain = tabUrl.split('http://');
+        finalDomain = tabDomain[1].split('/');
+      } else if (/https/i.test(tabUrl)) {
+        tabDomain = tabUrl.split('https://');
+        finalDomain = tabDomain[1].split('/');
+      } else {
+        finalDomain = tabDomain.split('/');
       }
-      finalDomain = tabDomain[1].split('/');
       return finalDomain[0];
     } else {
       console.warn('getDomain: url is null');
     }
-  }
-};
+  };
 
-var accessSheet = {
+  loadData = function(){
+    var url = localStorage["sheet_url"];
+    var sheet = new GoogleSpreadsheet();
+    sheet.url(url);
+    sheet.load(); //saves results to localStorage under "sheetData"
+    var data = localStorage["sheetData"].split(',');
+    return convertArray(data);
+  };
 
-  init: function(){
-    //localStorage.removeItem('GoogleSpreadsheet_data');
-    //public test spreadsheet:
-    //var sample_url = "https://docs.google.com/spreadsheet/ccc?key=0AutNQyCIKVnndF9xRnpxbDJxRTJjaWRjSENPbXZvbVE&usp=sharing";
-    //private test spreadsheet:
-    //var sample_url = "https://docs.google.com/spreadsheet/ccc?key=0AutNQyCIKVnndEdRRE5IUnhSOThQUTdXNmoxSGk1M1E#gid=0";
-    var sample_url = localStorage["sheet_url"];
-    var url = sample_url;
-    var googleSpreadsheet = new GoogleSpreadsheet();
-    googleSpreadsheet.url(url);
-    
-    googleSpreadsheet.load(function(result) {
-      chrome.tabs.query({
+  init = function() {
+    var spreadSheetData = loadData();
+    console.log(spreadSheetData);
+    chrome.tabs.query({
         active: true,
         lastFocusedWindow: true
-      }, function(array_of_Tabs) {
-        var tab = array_of_Tabs[0],
-            tabUrl = tab.url;
-        
-        else if (/https/i.test(tabUrl)) { tabDomain = tabUrl.split('https://'); }
-        plur = tabDomain[1].split('/');
-        var spreadSheetData = util.convertArray(result.data);
-        var found = util.findPW(spreadSheetData,plur[0]);
-        $('#un').text(found[0]);
-        $('#pw').text(found[1]);
-      });
+    }, function(array_of_Tabs) {
+      console.log(tab);
+      var tab = array_of_Tabs[0],
+          activeUrl = getDomain(tab.url),
+          found = findPW(spreadSheetData,activeUrl);
+      document.getElementById('un').textContent = found[0];
+      document.getElementById('pw').textContent = found[1];
+      localStorage.removeItem('sheetData');
     });
-  },
 
-};
+  };
 
+  return {
+    init: init
+  };
+});
+
+
+GoogleSpreadsheet = (function(){
+  function GoogleSpreadsheet() {}
+
+  GoogleSpreadsheet.prototype.url = function(url){
+    this.sourceIdentifier = url;
+    if (this.sourceIdentifier.match(/http(s)*:/)) {
+      this.url = this.sourceIdentifier;
+      try {
+        this.key = this.url.match(/key=(.*?)&/)[1];
+      } catch (error) {
+        this.key = this.url.match(/(cells|list)\/(.*?)\//)[2];
+      }
+    } else {
+      this.key = this.sourceIdentifier;
+    }
+    this.jsonCellsUrl = "https://spreadsheets.google.com/feeds/cells/" + this.key + '/od6/private/basic';
+  };
+
+  GoogleSpreadsheet.prototype.load = function() {
+    var params = {
+      'headers': {
+        'GData-Version': '3.0'
+      },
+      'parameters': {
+        'alt': 'json',
+        'showfolders': 'true'
+      }
+    };
+    var url = this.jsonCellsUrl;
+    bgPage.oauth.sendSignedRequest(url, GoogleSpreadsheet.process, params);
+  };
+
+  GoogleSpreadsheet.process = function(response,xhr){
+    var data = JSON.parse(response);
+    var _i, _len, _ref, _results;
+    _ref = data.feed.entry;
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      cell = _ref[_i];
+      _results.push(cell.content.$t);
+    }
+    localStorage["sheetData"] = _results;
+  };
+
+  return GoogleSpreadsheet;
+})();
+
+
+var access = new accessSheet();
 
 document.addEventListener('DOMContentLoaded', function() {
-  accessSheet.init();
+  access.init();
 });
