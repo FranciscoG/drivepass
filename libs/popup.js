@@ -22,10 +22,7 @@ var accessSheet = (function() {
   findPW = function(data,tabDomain) {
     if (data !== null && typeof data === 'object') {
       for (prop in data) {
-        var currSite = getDomain(data[prop].site);
-        console.log(currSite);
-        console.log(tabDomain);
-        if (currSite === tabDomain) {
+        if (data[prop].site === tabDomain) {
           var result = [];
           result.push(data[prop].u,data[prop].pw);
           return result;
@@ -58,24 +55,45 @@ var accessSheet = (function() {
     var url = localStorage["sheet_url"];
     var sheet = new GoogleSpreadsheet();
     sheet.url(url);
-    sheet.load(); //saves results to localStorage under "sheetData"
+    sheet.load(); //saves results to localStorage["sheetData"] or error to localStorage['error']
+    if (localStorage['error']) {
+      handleError(localStorage['error']);
+      return;
+    }
     var data = localStorage["sheetData"].split(',');
     return convertArray(data);
   };
 
+  handleError = function(err){
+    error = document.getElementById('error');
+    error.textContent = err;
+    error.style.display = 'block';
+    if (localStorage['error']){ localStorage.removeItem('error'); }
+  };
+
+  updateUI = function(result){
+    if (result !== null ){
+      document.getElementById('un').textContent = result[0];
+      document.getElementById('pw').textContent = result[1];
+    } else {
+      console.warn('results are null brah');
+    }
+  };
+
   init = function() {
     var spreadSheetData = loadData();
-    console.log(spreadSheetData);
     chrome.tabs.query({
         active: true,
         lastFocusedWindow: true
-    }, function(array_of_Tabs) {
-      console.log(tab);
-      var tab = array_of_Tabs[0],
-          activeUrl = getDomain(tab.url),
-          found = findPW(spreadSheetData,activeUrl);
-      document.getElementById('un').textContent = found[0];
-      document.getElementById('pw').textContent = found[1];
+    }, function(tabs) {
+      var tab = tabs[0];
+      var activeUrl = getDomain(tab.url);
+      var found = findPW(spreadSheetData,activeUrl);
+      if (typeof found === 'undefined') {
+        handleError('password not found');
+      } else {
+        updateUI(found);
+      }
       localStorage.removeItem('sheetData');
     });
 
@@ -120,6 +138,11 @@ GoogleSpreadsheet = (function(){
   };
 
   GoogleSpreadsheet.process = function(response,xhr){
+    if (xhr.status !== 200) {
+      console.log(xhr.status + " Connection Failed");
+      localStorage['error'] = "Connection failed";
+      return false;
+    }
     var data = JSON.parse(response);
     var _i, _len, _ref, _results;
     _ref = data.feed.entry;

@@ -21,7 +21,6 @@ function onAuthorized() {
     'parameters': {'alt': 'json'}
   };
 
-  // Send: GET https://docs.google.com/feeds/default/private/full?alt=json
   oauth.sendSignedRequest(url, callback, request);
 }
 
