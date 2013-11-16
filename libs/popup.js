@@ -8,9 +8,9 @@ var accessSheet = (function() {
       var a = 0, newObj = {};
       for (var i = 0; i < arr.length; i = i+3) {
         newObj[a] = {
-          site : arr[i],
-          u : arr[i+1],
-          pw : arr[i+2]
+          site : arr[i].trim(),
+          u : arr[i+1].trim(),
+          pw : arr[i+2].trim()
         };
         a++;
       }
@@ -22,7 +22,7 @@ var accessSheet = (function() {
   findPW = function(data,tabDomain) {
     if (data !== null && typeof data === 'object') {
       for (prop in data) {
-        if (data[prop].site === tabDomain) {
+        if (tabDomain.indexOf(data[prop].site) !== -1) {
           var result = [];
           result.push(data[prop].u,data[prop].pw);
           return result;
@@ -113,7 +113,7 @@ GoogleSpreadsheet = (function(){
     if (this.sourceIdentifier.match(/http(s)*:/)) {
       this.url = this.sourceIdentifier;
       try {
-        this.key = this.url.match(/key=(.*?)&/)[1];
+        this.key = this.url.match(/key=(.*?)(&|#)/)[1];
       } catch (error) {
         this.key = this.url.match(/(cells|list)\/(.*?)\//)[2];
       }
