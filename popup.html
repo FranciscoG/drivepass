@@ -19,7 +19,6 @@
         width:100%;
         box-sizing:border-box;
       }
-      span[contenteditable="true"] { color:#000;}
       .button {
         display: block;
         text-transform: uppercase;
@@ -36,6 +35,10 @@
         color: red;
         display: none;
       }
+      #success {
+        color:green;
+        display: none;
+      }
       .small {
         font-size: 9px;
         margin:5px 0;
@@ -44,6 +47,7 @@
         background: #248AFF;
         margin: 10px 0;
         padding:10px 0;
+        color:#efefef;
       }
       #add:hover {
         background: #0059BF;
@@ -59,11 +63,11 @@
   <body>
     <span id="un" contenteditable="true"></span>
     <span id="pw" contenteditable="true"></span>
-    <div id="add" class="button" title="add new login info to spreadsheet">
+    <div id="add" class="button" title="add new username and password to spreadsheet">
       add
     </div>
-
     <p id="error"></p>
+    <p id="success">saved</p>
   </body>
 </html>
 
