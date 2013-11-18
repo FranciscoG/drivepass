@@ -139,7 +139,7 @@ var GoogleSpreadsheet = (function(){
     } else {
       this.key = this.sourceIdentifier;
     }
-    this.jsonListUrl = "https://spreadsheets.google.com/feeds/list/" + this.key + '/od6/private/basic';
+    this.jsonListUrl = "https://spreadsheets.google.com/feeds/list/" + this.key + '/od6/private/full';
     this.jsonCellsUrl = "https://spreadsheets.google.com/feeds/cells/" + this.key + '/od6/private/basic';
   };
 
@@ -158,28 +158,29 @@ var GoogleSpreadsheet = (function(){
   };
 
   GoogleSpreadsheet.constructSpreadAtomXml_ = function(site, u, pw) {
-    var atom = ["<?xml version='1.0' encoding='UTF-8'?>",
-          '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">',
-          '<gsx:title>',site,'</gsx:title>',
-          '<gsx:content>','username: '+u +', password: '+pw,'</gsx:content>',
-          '</entry>'].join('');
+    var atom = '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">\n' +
+        '<gsx:site>'+site+'</gsx:site>\n' +
+        '<gsx:username>'+u+'</gsx:username>\n' +
+        '<gsx:password>'+pw+'</gsx:password>\n' +
+        '</entry>';
     return atom;
   };
 
   GoogleSpreadsheet.prototype.add = function(data){
     var handleSuccess = function(response,xhr) {
       if (xhr.status !== 200) {
-        localStorage['error'] = "error saving";
+        localStorage['error'] = xhr.status + ": " + xhr.statusText + ": " + xhr.responseText;
         console.log(xhr);
       } else {
         var success = document.getElementById('success');
         success.style.display = "block";
+        console.log(xhr);
       }
     };
 
     var atom = GoogleSpreadsheet.constructSpreadAtomXml_('uuurl', 'bob', '123');
     var params = {
-      'method': 'PUT',
+      'method': 'POST',
       'headers': {
         'GData-Version': '3.0',
         'Content-Type': 'application/atom+xml'
@@ -198,6 +199,7 @@ var GoogleSpreadsheet = (function(){
       return false;
     }
     var data = JSON.parse(response);
+    localStorage['rows'] = data.feed.entry.length / 3;
     var _i, _len, _ref, _results;
     _ref = data.feed.entry;
     _results = [];
