@@ -3,6 +3,8 @@ var bgPage = chrome.extension.getBackgroundPage();
 var accessSheet = (function() {
   var init,convertArray,findPW,getDomain,loadData,bindAdd;
 
+  var sheet = new GoogleSpreadsheet();
+
   convertArray = function(arr){
     if (arr !== null) {
       var a = 0, newObj = {};
@@ -52,9 +54,6 @@ var accessSheet = (function() {
   };
 
   loadData = function(){
-    var url = localStorage["sheet_url"];
-    var sheet = new GoogleSpreadsheet();
-    sheet.url(url);
     sheet.load(); //saves results to localStorage["sheetData"] or error to localStorage['error']
     if (localStorage['error']) {
       handleError(localStorage['error']);
@@ -80,14 +79,11 @@ var accessSheet = (function() {
       document.getElementById('un').textContent = result[0];
       document.getElementById('pw').textContent = result[1];
     } else {
-      console.warn('results are null brah');
+      console.warn('updateUI: results are null');
     }
   };
 
   bindAdd = function(){
-    var url = localStorage["sheet_url"];
-    var sheet = new GoogleSpreadsheet();
-    sheet.url(url);
     add = document.getElementById('add');
     add.addEventListener('click', function(evt) {
       sheet.add();
@@ -95,7 +91,7 @@ var accessSheet = (function() {
       if (typeof error !== 'undefined'){
         handleError(error);
       }
-    });
+    },false);
   };
 
   init = function() {
@@ -107,6 +103,7 @@ var accessSheet = (function() {
     }, function(tabs) {
       var tab = tabs[0];
       var activeUrl = getDomain(tab.url);
+      sheet.setTabUrl(activeUrl);
       var found = findPW(spreadSheetData,activeUrl);
       if (typeof found === 'undefined') {
         handleError('password not found');
@@ -125,10 +122,8 @@ var accessSheet = (function() {
 
 
 var GoogleSpreadsheet = (function(){
-  function GoogleSpreadsheet() {}
-
-  GoogleSpreadsheet.prototype.url = function(url){
-    this.sourceIdentifier = url;
+  function GoogleSpreadsheet() {
+    this.sourceIdentifier = localStorage["sheet_url"];
     if (this.sourceIdentifier.match(/http(s)*:/)) {
       this.url = this.sourceIdentifier;
       try {
@@ -141,7 +136,8 @@ var GoogleSpreadsheet = (function(){
     }
     this.jsonListUrl = "https://spreadsheets.google.com/feeds/list/" + this.key + '/od6/private/full';
     this.jsonCellsUrl = "https://spreadsheets.google.com/feeds/cells/" + this.key + '/od6/private/basic';
-  };
+    this.tabUrl = "";
+  }
 
   GoogleSpreadsheet.prototype.load = function() {
     var params = {
@@ -157,35 +153,40 @@ var GoogleSpreadsheet = (function(){
     bgPage.oauth.sendSignedRequest(url, GoogleSpreadsheet.process, params);
   };
 
-  GoogleSpreadsheet.constructSpreadAtomXml_ = function(site, u, pw) {
-    var atom = '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">\n' +
-        '<gsx:site>'+site+'</gsx:site>\n' +
-        '<gsx:username>'+u+'</gsx:username>\n' +
+  GoogleSpreadsheet.prototype.setTabUrl = function(tabUrl) {
+    this.tabUrl = tabUrl || "";
+    localStorage['tabUrl'] = tabUrl || "";
+  };
+
+  GoogleSpreadsheet.constructSpreadAtomXml_ = function() {
+    var un = document.getElementById('un').textContent;
+    var pw = document.getElementById('pw').textContent;
+    var atomXML = '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">\n' +
+        '<gsx:site>'+localStorage['tabUrl']+'</gsx:site>\n' +
+        '<gsx:username>'+un+'</gsx:username>\n' +
         '<gsx:password>'+pw+'</gsx:password>\n' +
         '</entry>';
-    return atom;
+    return atomXML;
   };
 
   GoogleSpreadsheet.prototype.add = function(data){
     var handleSuccess = function(response,xhr) {
-      if (xhr.status !== 200) {
-        localStorage['error'] = xhr.status + ": " + xhr.statusText + ": " + xhr.responseText;
-        console.log(xhr);
+      if (xhr.status !== 201) {
+        localStorage['error'] = 'error saving';
       } else {
-        var success = document.getElementById('success');
-        success.style.display = "block";
-        console.log(xhr);
+        document.getElementById('error').style.display = "none";
+        document.getElementById('success').style.display = "block";
       }
+      console.log(xhr);
     };
 
-    var atom = GoogleSpreadsheet.constructSpreadAtomXml_('uuurl', 'bob', '123');
     var params = {
       'method': 'POST',
       'headers': {
         'GData-Version': '3.0',
         'Content-Type': 'application/atom+xml'
       },
-      'body': atom
+      'body': GoogleSpreadsheet.constructSpreadAtomXml_()
     };
 
     var url = this.jsonListUrl;
