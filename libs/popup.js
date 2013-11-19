@@ -216,7 +216,4 @@ var GoogleSpreadsheet = (function(){
 
 
 var access = new accessSheet();
-
-document.addEventListener('DOMContentLoaded', function() {
-  access.init();
-});
+access.init();
