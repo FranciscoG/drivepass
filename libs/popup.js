@@ -172,7 +172,7 @@ var GoogleSpreadsheet = (function(){
   GoogleSpreadsheet.prototype.add = function(data){
     var handleSuccess = function(response,xhr) {
       if (xhr.status !== 201) {
-        localStorage['error'] = 'error saving';
+        localStorage['error'] = xhr.status + ': error saving';
       } else {
         document.getElementById('error').style.display = "none";
         document.getElementById('success').style.display = "block";
@@ -195,7 +195,7 @@ var GoogleSpreadsheet = (function(){
 
   GoogleSpreadsheet.process = function(response,xhr){
     if (xhr.status !== 200) {
-      console.log(xhr.status + " Connection Failed");
+      console.log(xhr.status + ": Connection Failed");
       localStorage['error'] = "Connection failed";
       return false;
     }
