@@ -1,13 +1,17 @@
 (function(){
-  
+
   var bgPage = chrome.extension.getBackgroundPage();
+
+  var issetParam = function(a){
+    return (void 0===a || null===a) ? false : true;
+  };
 
   var accessSheet = (function() {
 
     var sheet = new GoogleSpreadsheet();
 
     var findPW = function(data,tabDomain) {
-      if (data !== null && typeof data === 'object') {
+      if (issetParam(data) && typeof data === 'object') {
         for (prop in data) {
           if (tabDomain.indexOf(data[prop].site) !== -1) {
             var result = [];
@@ -20,7 +24,7 @@
       }
     };
     var getDomain = function(tabUrl){
-      if (tabUrl !== null) {
+      if (issetParam(tabUrl)) {
         var tabDomain,
             finalDomain;
         if (/http:/i.test(tabUrl)) {
@@ -49,7 +53,7 @@
     };
 
     var handleError = function(err){
-      if (err !== null){
+      if (issetParam(err)){
         var error = document.getElementById('error');
         error.textContent = err;
         error.style.display = 'block';
@@ -60,7 +64,7 @@
     };
 
     var updateUI = function(result){
-      if (result !== null ){
+      if (issetParam(result)){
         document.getElementById('un').textContent = result[0];
         document.getElementById('pw').textContent = result[1];
       } else {
