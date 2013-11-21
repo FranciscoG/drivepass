@@ -68,7 +68,7 @@
       if (stat !== '' && msg !== '') {
         statusElem.textContent = msg;
         statusElem.className = stat;
-        statusElem.display = "block";
+        statusElem.style.display = "block";
       }
       if (typeof localStorage['error'] !== 'undefined'){
         localStorage.removeItem('error');
