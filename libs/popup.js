@@ -222,7 +222,11 @@
 
   var access = new accessSheet();
   
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function(e) {
+    if (this.bDone) {
+      return;
+    }
+    this.bDone = true;
     access.init();
   });
 
