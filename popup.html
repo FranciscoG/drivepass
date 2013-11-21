@@ -19,6 +19,13 @@
         width:100%;
         box-sizing:border-box;
       }
+      .label {
+        margin:3px 0;
+        text-transform: lowercase;
+        color:grey;
+        text-align: right;
+        font-size: 11px;
+      }
       .button {
         display: block;
         text-transform: uppercase;
@@ -31,12 +38,13 @@
         color:#fff;
         background: #fff;
       }
-      #error {
+      .error {
         color: red;
-        display: none;
       }
-      #success {
+      .success {
         color:green;
+      }
+      #status {
         display: none;
       }
       .small {
@@ -61,13 +69,14 @@
     <script src="libs/popup.js"></script>
   </head>
   <body>
+    <p class="label">username</p>
     <span id="un" contenteditable="true"></span>
+    <p class="label">password</p>
     <span id="pw" contenteditable="true"></span>
     <div id="add" class="button" title="add new username and password to spreadsheet">
       add
     </div>
-    <p id="error"></p>
-    <p id="success">saved</p>
+    <p id="status"></p>
     <script src="libs/popup.js"></script>
   </body>
 </html>

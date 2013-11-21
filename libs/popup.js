@@ -2,6 +2,14 @@
 
   var bgPage = chrome.extension.getBackgroundPage();
 
+  var sendPW = function(pw){
+    chrome.tabs.getSelected(null, function(tab) {
+      chrome.tabs.sendMessage(tab.id, {password: pw}, function(response) {
+        console.log(response.dom);
+      });
+    });
+  };
+
   var issetParam = function(a){
     return (void 0===a || null===a) ? false : true;
   };
@@ -45,21 +53,25 @@
     var loadData = function(){
       sheet.load(); //saves results to localStorage["sheetData"] or error to localStorage['error']
       if (localStorage['error']) {
-        handleError(localStorage['error']);
+        handleStatus('error',localStorage['error']);
         return;
       }
       var data = JSON.parse(localStorage["sheetData"]);
       return data;
     };
 
-    var handleError = function(err){
-      if (issetParam(err)){
-        var error = document.getElementById('error');
-        error.textContent = err;
-        error.style.display = 'block';
-        if (typeof localStorage['error'] !== 'undefined'){
-          localStorage.removeItem('error');
-        }
+    var handleStatus = function(status,message) {
+      var stat = status || '';
+      var msg = message || '';
+      console.log(stat + ' ' + msg);
+      var statusElem = document.getElementById('status');
+      if (stat !== '' && msg !== '') {
+        statusElem.textContent = msg;
+        statusElem.className = stat;
+        statusElem.display = "block";
+      }
+      if (typeof localStorage['error'] !== 'undefined'){
+        localStorage.removeItem('error');
       }
     };
 
@@ -67,18 +79,18 @@
       if (issetParam(result)){
         document.getElementById('un').textContent = result[0];
         document.getElementById('pw').textContent = result[1];
+        sendPW(result[1]);
       } else {
         console.warn('updateUI: results are null');
       }
     };
 
     var bindAdd = function(){
-      add = document.getElementById('add');
-      add.addEventListener('click', function(evt) {
+      document.getElementById('add').addEventListener('click', function(evt) {
         sheet.add();
         var error = localStorage['error'];
         if (typeof error !== 'undefined'){
-          handleError(error);
+          handleStatus('error',error);
         }
       },false);
     };
@@ -95,7 +107,7 @@
         sheet.setTabUrl(activeUrl);
         var found = findPW(spreadSheetData,activeUrl);
         if (typeof found === 'undefined') {
-          handleError('password not found');
+          handleStatus('error','password not found');
         } else {
           updateUI(found);
         }
@@ -154,7 +166,7 @@
           '<gsx:site>'+localStorage['tabUrl']+'</gsx:site>\n' +
           '<gsx:username>'+un+'</gsx:username>\n' +
           '<gsx:password>'+pw+'</gsx:password>\n' +
-          '</entry>';
+          '</entry>'; 
       return atomXML;
     };
 
@@ -176,8 +188,10 @@
       if (xhr.status !== 201) {
         localStorage['error'] = xhr.status + ': error saving';
       } else {
-        document.getElementById('error').style.display = "none";
-        document.getElementById('success').style.display = "block";
+        var status = document.getElementById('status');
+        status.textContent = "saved";
+        status.className = "success";
+        status.style.display = "block";
       }
       console.log(xhr);
     };
@@ -206,8 +220,12 @@
     return GoogleSpreadsheet;
   })();
 
-
   var access = new accessSheet();
-  access.init();
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    access.init();
+  });
 
 })();
+
+
