@@ -72,17 +72,20 @@
     var bindAdd = function(){
       document.getElementById('add').addEventListener('click', function(evt) {
         Sheet.add();
-        var status = getResults();
-        if (status.success === false){
-          handleStatus('error',status.message);
-        } else {
-          handleStatus('success', status.message);
-        }
+        var a = setTimeout(function(){
+          var status = getResults();
+          if (status.success === false){
+            handleStatus('error',status.message);
+          } else {
+            handleStatus('success', status.message);
+          }
+        },500);
       },false);
     };
 
     var getResults = function(){
-      return JSON.parse(localStorage['result']);
+      var results = localStorage.getItem('result');
+      return JSON.parse(results);
     };
 
     var init = function() {

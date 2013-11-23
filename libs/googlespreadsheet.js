@@ -29,8 +29,7 @@ var GoogleSpreadsheet = (function(){
       }
       _response.sheetData = _results;
     }
-    localStorage.removeItem('result');
-    localStorage["result"] = JSON.stringify(_response);
+    localStorage.setItem("result",JSON.stringify(_response));
   };
 
   var load = function() {
@@ -64,11 +63,10 @@ var GoogleSpreadsheet = (function(){
     } else {
       _response = {success:true, message: 'saved', on: "add"};
     }
-    localStorage.removeItem('result');
-    localStorage["result"] = JSON.stringify(_response);
+    localStorage.setItem("result",JSON.stringify(_response));
   };
   
-  var add = function(){
+  var add = function(cb){
     var params = {
       'method': 'POST',
       'headers': {
