@@ -1,22 +1,20 @@
 (function(){
 
-  var bgPage = chrome.extension.getBackgroundPage();
-
-  var sendPW = function(pw){
-    chrome.tabs.getSelected(null, function(tab) {
-      chrome.tabs.sendMessage(tab.id, {password: pw}, function(response) {
-        console.log(response.dom);
-      });
-    });
-  };
-
   var issetParam = function(a){
     return (void 0===a || null===a) ? false : true;
   };
 
   var accessSheet = (function() {
 
-    var sheet = new GoogleSpreadsheet();
+    var Sheet = new GoogleSpreadsheet();
+
+    var sendPW = function(pw){
+      chrome.tabs.getSelected(null, function(tab) {
+        chrome.tabs.sendMessage(tab.id, {password: pw}, function(response) {
+          console.log(response.dom);
+        });
+      });
+    };
 
     var findPW = function(data,tabDomain) {
       if (issetParam(data) && typeof data === 'object') {
@@ -50,28 +48,14 @@
       }
     };
 
-    var loadData = function(){
-      sheet.load(); //saves results to localStorage["sheetData"] or error to localStorage['error']
-      if (localStorage['error']) {
-        handleStatus('error',localStorage['error']);
-        return;
-      }
-      var data = JSON.parse(localStorage["sheetData"]);
-      return data;
-    };
-
     var handleStatus = function(status,message) {
       var stat = status || '';
       var msg = message || '';
-      console.log(stat + ' ' + msg);
       var statusElem = document.getElementById('status');
       if (stat !== '' && msg !== '') {
         statusElem.textContent = msg;
         statusElem.className = stat;
         statusElem.style.display = "block";
-      }
-      if (typeof localStorage['error'] !== 'undefined'){
-        localStorage.removeItem('error');
       }
     };
 
@@ -87,138 +71,46 @@
 
     var bindAdd = function(){
       document.getElementById('add').addEventListener('click', function(evt) {
-        sheet.add();
-        var error = localStorage['error'];
-        if (typeof error !== 'undefined'){
-          handleStatus('error',error);
+        Sheet.add();
+        var status = getResults();
+        if (status.success === false){
+          handleStatus('error',status.message);
+        } else {
+          handleStatus('success', status.message);
         }
       },false);
     };
 
+    var getResults = function(){
+      return JSON.parse(localStorage['result']);
+    };
+
     var init = function() {
-      bindAdd();
-      var spreadSheetData = loadData();
       chrome.tabs.query({
-          active: true,
-          lastFocusedWindow: true
+        active: true,
+        lastFocusedWindow: true
       }, function(tabs) {
         var tab = tabs[0];
         var activeUrl = getDomain(tab.url);
-        sheet.setTabUrl(activeUrl);
-        var found = findPW(spreadSheetData,activeUrl);
+        Sheet.init({
+          sheet_url : localStorage['sheet_url'],
+          tab_url : activeUrl
+        }).load();
+        var status = getResults();
+        var found = findPW(status.sheetData,activeUrl);
         if (typeof found === 'undefined') {
           handleStatus('error','password not found');
         } else {
           updateUI(found);
         }
-        localStorage.removeItem('sheetData');
       });
-
+      bindAdd();
     };
 
     return {
       init: init
     };
   });
-
-
-  var GoogleSpreadsheet = (function(){
-    function GoogleSpreadsheet() {
-      this.sourceIdentifier = localStorage["sheet_url"];
-      if (this.sourceIdentifier.match(/http(s)*:/)) {
-        this.url = this.sourceIdentifier;
-        try {
-          this.key = this.url.match(/key=(.*?)(&|#)/)[1];
-        } catch (error) {
-          this.key = this.url.match(/(cells|list)\/(.*?)\//)[2];
-        }
-      } else {
-        this.key = this.sourceIdentifier;
-      }
-      this.jsonListUrl = "https://spreadsheets.google.com/feeds/list/" + this.key + '/od6/private/full';
-      this.jsonCellsUrl = "https://spreadsheets.google.com/feeds/cells/" + this.key + '/od6/private/basic';
-      this.tabUrl = "";
-    }
-
-    GoogleSpreadsheet.prototype.load = function() {
-      var params = {
-        'headers': {
-          'GData-Version': '3.0'
-        },
-        'parameters': {
-          'alt': 'json',
-          'showfolders': 'true'
-        }
-      };
-      var url = this.jsonListUrl;
-      bgPage.oauth.sendSignedRequest(url, GoogleSpreadsheet.processLoad, params);
-    };
-
-    GoogleSpreadsheet.prototype.setTabUrl = function(tabUrl) {
-      this.tabUrl = tabUrl || "";
-      localStorage['tabUrl'] = tabUrl || "";
-    };
-
-    GoogleSpreadsheet.constructSpreadAtomXml_ = function() {
-      var un = document.getElementById('un').textContent;
-      var pw = document.getElementById('pw').textContent;
-      var atomXML = '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">\n' +
-          '<gsx:site>'+localStorage['tabUrl']+'</gsx:site>\n' +
-          '<gsx:username>'+un+'</gsx:username>\n' +
-          '<gsx:password>'+pw+'</gsx:password>\n' +
-          '</entry>'; 
-      return atomXML;
-    };
-
-    GoogleSpreadsheet.prototype.add = function(data){
-      var params = {
-        'method': 'POST',
-        'headers': {
-          'GData-Version': '3.0',
-          'Content-Type': 'application/atom+xml'
-        },
-        'body': GoogleSpreadsheet.constructSpreadAtomXml_()
-      };
-
-      var url = this.jsonListUrl;
-      bgPage.oauth.sendSignedRequest(url, GoogleSpreadsheet.processAdd, params);
-    };
-
-    GoogleSpreadsheet.processAdd = function(response,xhr){
-      if (xhr.status !== 201) {
-        localStorage['error'] = xhr.status + ': error saving';
-      } else {
-        var status = document.getElementById('status');
-        status.textContent = "saved";
-        status.className = "success";
-        status.style.display = "block";
-      }
-      console.log(xhr);
-    };
-
-    GoogleSpreadsheet.processLoad = function(response,xhr){
-      if (xhr.status !== 200) {
-        console.log(xhr.status + ": Connection Failed");
-        localStorage['error'] = "Connection failed";
-        return false;
-      }
-      var data = JSON.parse(response);
-      var _i = 0,
-          _results = {},
-          _entries = data.feed.entry;
-      for (prop in _entries) {
-        _results[_i] = {
-            site : _entries[prop].gsx$site.$t,
-            pw : _entries[prop].gsx$password.$t,
-            u : _entries[prop].gsx$username.$t
-        }
-        _i++;
-      }
-      localStorage["sheetData"] = JSON.stringify(_results);
-    };
-
-    return GoogleSpreadsheet;
-  })();
 
   var access = new accessSheet();
   

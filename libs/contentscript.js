@@ -9,7 +9,9 @@
   var nodes = document.getElementsByTagName('input');
 
   for (var i=0;i<nodes.length;i++) {
-    nodes[i].addEventListener('focus',getFocused,false);
+    if (nodes[i].type === "text" || nodes[i].type === "password") {
+      nodes[i].addEventListener('focus',getFocused,false);
+    }
   }
 
   function insertPW(pw) {
