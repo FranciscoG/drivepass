@@ -25,3 +25,7 @@ function onAuthorized() {
 }
 
 oauth.authorize(onAuthorized);
+
+if (!localStorage['sheet_url']) {
+  chrome.tabs.create({url: "options.html"});
+}
