@@ -34,13 +34,17 @@ Copy and paste your private spreadsheet url into the options and click "save"
 ### Autofill
 
   When you are on a site's login screen:
-  * click into the password input field as if you were about to start typing
+
+  * click into the email input field as if you were about to start typing
+
   * then click on the browser action 
 
-Your password should automatically get inserted into the input field
+  * Your username and password should automatically get inserted into the input field
 
 **TODO:**
+
 * add option for user defined column row headers
+
 * improve UI
 
 ----
