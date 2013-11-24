@@ -79,7 +79,7 @@
           } else {
             handleStatus('success', status.message);
           }
-        },500);
+        },1000);
       },false);
     };
 

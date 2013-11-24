@@ -74,7 +74,7 @@ label {
     overflow:hidden;
 }
 input[type="checkbox"], #digits {
-   float: left;
+  float: left;
   margin-right:5px;
 }
 #digits {
