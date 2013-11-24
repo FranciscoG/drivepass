@@ -8,9 +8,9 @@
 
     var Sheet = new GoogleSpreadsheet();
 
-    var sendPW = function(pw){
+    var sendDetails = function(un,pw){
       chrome.tabs.getSelected(null, function(tab) {
-        chrome.tabs.sendMessage(tab.id, {password: pw}, function(response) {
+        chrome.tabs.sendMessage(tab.id, {password: pw,username: un}, function(response) {
           console.log(response.dom);
         });
       });
@@ -63,7 +63,7 @@
       if (issetParam(result)){
         document.getElementById('un').textContent = result[0];
         document.getElementById('pw').textContent = result[1];
-        sendPW(result[1]);
+        sendDetails(result[0],result[1]);
       } else {
         console.warn('updateUI: results are null');
       }
@@ -116,15 +116,15 @@
   });
 
   var access = new accessSheet();
+  var generate = new Generator();
   
   document.addEventListener('DOMContentLoaded', function(e) {
     if (this.bDone) {
       return;
     }
     this.bDone = true;
+    generate.init();
     access.init();
   });
 
 })();
-
-

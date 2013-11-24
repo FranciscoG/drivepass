@@ -2,69 +2,7 @@
 <html>
   <head>
     <title>Getting Started Extension's Popup</title>
-    <style scoped>
-      body {
-        width: 220px;
-        overflow-x: hidden;
-        height:auto;
-        font-size: 14px;
-        font-family: sans-serif; 
-      }
-      span {
-        display:block;
-        padding:5px;
-        height:30px;
-        border:1px solid #c8c8c8;
-        color:#aaa;
-        width:100%;
-        box-sizing:border-box;
-      }
-      .label {
-        margin:3px 0;
-        text-transform: lowercase;
-        color:grey;
-        text-align: right;
-        font-size: 11px;
-      }
-      .button {
-        display: block;
-        text-transform: uppercase;
-        text-align: center;
-      }
-      #pw {
-        color:#efefef;
-      }
-      #pw::selection {
-        color:#fff;
-        background: #fff;
-      }
-      .error {
-        color: red;
-      }
-      .success {
-        color:green;
-      }
-      #status {
-        display: none;
-      }
-      .small {
-        font-size: 9px;
-        margin:5px 0;
-      }
-      #add {
-        background: #248AFF;
-        margin: 10px 0;
-        padding:10px 0;
-        color:#efefef;
-      }
-      #add:hover {
-        background: #0059BF;
-        cursor: pointer;
-      }
-      #add:active {
-        color:#fff;
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="css/popup.css">
   </head>
   <body>
     <p class="label">username</p>
@@ -75,7 +13,36 @@
       add
     </div>
     <p id="status"></p>
+
+    <div id="generateContainer">
+      <label>
+        <input type="checkbox" id="showGPoptions" />generate password?
+      </label>
+      <div id="gpOptions">
+        <label>
+          <input type="text" id="digits" maxlength="2" value="26"/>Minimum Password Length
+        </label>
+        <label>
+          <input type="checkbox" id="uppercase" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ" checked />A-Z
+        </label>
+        <label>
+          <input type="checkbox" id="lowercase" value="abcdefghijklnopqrstuvwxyz" checked />a-z
+        </label>
+        <label>
+          <input type="checkbox" id="numbers" value="0123456789" checked />0-9
+        </label>
+        <label>
+          <input type="checkbox" id="symbols" value="#_@." />#_-@.
+        </label>
+        <label>
+          <input type="button" id="makePassword" value="generate" />
+        </label>
+      </div>
+    </div>
+    
     <script src="libs/googlespreadsheet.js"></script>
+    <script src="libs/password-generator.js"></script>
     <script src="libs/popup.js"></script>
+
   </body>
 </html>

@@ -1,0 +1,91 @@
+body {
+  width: 220px;
+  overflow-x: hidden;
+  height:auto;
+  font-size: 14px;
+  font-family: sans-serif; 
+}
+span {
+  display:block;
+  padding:5px;
+  height:30px;
+  border:1px solid #c8c8c8;
+  color:#aaa;
+  width:100%;
+  box-sizing:border-box;
+}
+.label {
+  margin:3px 0;
+  text-transform: lowercase;
+  color:grey;
+  text-align: right;
+  font-size: 11px;
+}
+.button {
+  display: block;
+  text-transform: uppercase;
+  text-align: center;
+}
+#pw {
+  color:#efefef;
+}
+#pw::selection {
+  color:#fff;
+  background: #fff;
+}
+#pw.generated {
+  color:#000;
+  height: auto;
+}
+#pw.generated::selection {
+  color:#fff;
+  background: #000;
+}
+.error {
+  color: red;
+}
+.success {
+  color:green;
+}
+#status {
+  display: none;
+}
+.small {
+  font-size: 9px;
+  margin:5px 0;
+}
+#add {
+  background: #248AFF;
+  margin: 10px 0;
+  padding:10px 0;
+  color:#efefef;
+}
+#add:hover {
+  background: #0059BF;
+  cursor: pointer;
+}
+#add:active {
+  color:#fff;
+}
+
+label {
+    display: block;
+    min-height:20px;
+    overflow:hidden;
+}
+input[type="checkbox"], #digits {
+   float: left;
+  margin-right:5px;
+}
+#digits {
+  width:20px;
+}
+#gpOptions {
+  height:0;
+  overflow: hidden;
+  transition: height .3s linear;
+}
+
+.toggled {
+  height: auto !important;
+}
