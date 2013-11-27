@@ -47,6 +47,9 @@ Copy and paste your private spreadsheet url into the options and click "save"
 
 * improve UI
 
+* setup some kind of encryption with a one-password unlocking
+
+
 ----
 
 credits:  
