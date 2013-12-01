@@ -26,6 +26,9 @@ span {
   text-transform: uppercase;
   text-align: center;
 }
+.button:hover {
+  cursor:pointer;
+}
 #pw {
   color:#efefef;
 }
@@ -80,12 +83,11 @@ input[type="checkbox"], #digits {
 #digits {
   width:20px;
 }
-#gpOptions {
+.hidden {
   height:0;
   overflow: hidden;
   transition: height .3s linear;
 }
-
-.toggled {
+.hidden.show {
   height: auto !important;
 }

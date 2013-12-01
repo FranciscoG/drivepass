@@ -4,6 +4,22 @@
     return (void 0===a || null===a) ? false : true;
   };
 
+  var toggler = function(handler,targ) {
+    var elm = document.getElementById(targ);
+    document.getElementById(handler).addEventListener('click',function(e){
+      if (elm.classList.contains("show")) {
+        elm.classList.remove('show');
+      } else {
+        elm.classList.add('show');
+      }
+    },false);
+  };
+
+  var initUI = function(){
+    toggler('showGPoptions','gpOptions');
+    toggler('showInfo','theInfo');
+  };
+  
   var accessSheet = (function() {
 
     var Sheet = new GoogleSpreadsheet();
@@ -125,6 +141,7 @@
     this.bDone = true;
     generate.init();
     access.init();
+    initUI();
   });
 
 })();
