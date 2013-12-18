@@ -30,9 +30,13 @@ var GoogleSpreadsheet = (function(){
       _response.sheetData = _results;
     }
     localStorage.setItem("result",JSON.stringify(_response));
+    if (_options.cb !== null) {
+      _options.cb();
+    }
   };
 
-  var load = function() {
+  var load = function(cb) {
+    _options.cb = (typeof cb === "function") ? cb : null;
     var params = {
       'headers': {
         'GData-Version': '3.0'
@@ -43,6 +47,19 @@ var GoogleSpreadsheet = (function(){
       }
     };
     bgPage.oauth.sendSignedRequest(_options.jsonListUrl, processLoad, params);
+  };
+
+  var add = function(cb){
+    _options.cb = (typeof cb === "function") ? cb : null;
+    var params = {
+      'method': 'POST',
+      'headers': {
+        'GData-Version': '3.0',
+        'Content-Type': 'application/atom+xml'
+      },
+      'body': constructSpreadAtomXml_(_options.tab_url)
+    };
+    bgPage.oauth.sendSignedRequest(_options.jsonListUrl, processAdd, params);
   };
 
   var constructSpreadAtomXml_ = function(tabUrl) {
@@ -64,26 +81,18 @@ var GoogleSpreadsheet = (function(){
       _response = {success:true, message: 'saved', on: "add"};
     }
     localStorage.setItem("result",JSON.stringify(_response));
+    if (_options.cb !== null) {
+      _options.cb();
+    }
   };
   
-  var add = function(cb){
-    var params = {
-      'method': 'POST',
-      'headers': {
-        'GData-Version': '3.0',
-        'Content-Type': 'application/atom+xml'
-      },
-      'body': constructSpreadAtomXml_(_options.tab_url)
-    };
-
-    bgPage.oauth.sendSignedRequest(_options.jsonListUrl, processAdd, params);
-  };
+  
 
   /*
     example usage and required parameters
     var spreadsheet = Googlespreadsheet.init({
       sheet_url : 'http://link.to.your?spreadsheet'
-      tab_url : 'www.blabla.com' //active tab url, on necessary for 'add' method
+      tab_url : 'www.blabla.com' //active tab url, only necessary for 'add' method
     })
 
     returns status object
