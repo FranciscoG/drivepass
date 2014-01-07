@@ -19,7 +19,7 @@ var GoogleSpreadsheet = (function(){
       var _i = 0,
           _results = {},
           _entries = data.feed.entry;
-      for (prop in _entries) {
+      for (var prop in _entries) {
         _results[_i] = {
           site : _entries[prop].gsx$site.$t,
           pw : _entries[prop].gsx$password.$t,
@@ -29,9 +29,10 @@ var GoogleSpreadsheet = (function(){
       }
       _response.sheetData = _results;
     }
-    localStorage.setItem("result",JSON.stringify(_response));
+    //localStorage.setItem("result",JSON.stringify(_response));
+    //return JSON.stringify(_response);
     if (_options.cb !== null) {
-      _options.cb();
+      _options.cb(_response);
     }
   };
 

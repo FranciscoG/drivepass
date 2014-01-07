@@ -15,6 +15,9 @@
     } else {
       document.getElementById("sheet_url").value = curr_url;
       document.getElementById("save").textContent = "update";
+      var sheetJump = document.getElementById("goToSheet");
+      sheetJump.href = curr_url;
+      sheetJump.style.display = "block";
     }
   }
   document.addEventListener('DOMContentLoaded', restore_options);

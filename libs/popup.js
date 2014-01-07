@@ -33,6 +33,7 @@
     };
 
     var findPW = function(data,tabDomain) {
+      var data = data || {};
       if (issetParam(data) && typeof data === 'object') {
         for (prop in data) {
           if (tabDomain.indexOf(data[prop].site) !== -1) {
@@ -45,22 +46,16 @@
         console.warn('findPW: data not an object');
       }
     };
+
     var getDomain = function(tabUrl){
-      if (issetParam(tabUrl)) {
-        var tabDomain,
-            finalDomain;
-        if (/http:/i.test(tabUrl)) {
-          tabDomain = tabUrl.split('http://');
-          finalDomain = tabDomain[1].split('/');
-        } else if (/https/i.test(tabUrl)) {
-          tabDomain = tabUrl.split('https://');
-          finalDomain = tabDomain[1].split('/');
-        } else {
-          finalDomain = tabDomain.split('/');
-        }
-        return finalDomain[0];
+      // inspired by: http://stackoverflow.com/a/12470263
+      var tUrl = tabUrl || "",
+          a = document.createElement('a');
+      if (tUrl !== ""){
+        a.href = tUrl;
+        return a['hostname'];
       } else {
-        console.warn('getDomain: url is null');
+        console.warn('tab url undefined');
       }
     };
 
@@ -99,11 +94,6 @@
       },false);
     };
 
-    var getResults = function(){
-      var results = localStorage.getItem('result');
-      return JSON.parse(results);
-    };
-
     var init = function() {
       chrome.tabs.query({
         active: true,
@@ -114,14 +104,14 @@
         Sheet.init({
           sheet_url : localStorage['sheet_url'],
           tab_url : activeUrl
-        }).load();
-        var status = getResults();
-        var found = findPW(status.sheetData,activeUrl);
-        if (typeof found === 'undefined') {
-          handleStatus('error','password not found');
-        } else {
-          updateUI(found);
-        }
+        }).load(function(result){
+          var found = findPW(result.sheetData,activeUrl);
+          if (typeof found === 'undefined') {
+            handleStatus('error','password not found');
+          } else {
+            updateUI(found);
+          }
+        });
       });
       bindAdd();
     };
@@ -136,7 +126,7 @@
   
   document.addEventListener('DOMContentLoaded', function(e) {
     if (this.bDone) {
-      return;
+      return; // deal with this being fired twice
     }
     this.bDone = true;
     generate.init();
