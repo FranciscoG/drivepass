@@ -5,8 +5,12 @@
     <link rel="stylesheet" type="text/css" href="css/popup.css">
   </head>
   <body>
-    <div id="showInfo" class="button">
-      show info
+    <div id="showInfo">
+      <div id="loading">
+        <div class="spinner"></div>
+        <div class="line"></div>
+      </div>
+      <div id="status"></div>
     </div>
     <div class="hidden" id="theInfo">
       <p class="label">username</p>
@@ -16,7 +20,6 @@
       <div id="add" class="button" title="add new username and password to spreadsheet">
         add
       </div>
-      <p id="status"></p>
 
       <div id="generateContainer">
         <label>

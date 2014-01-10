@@ -4,6 +4,7 @@
     return (void 0===a || null===a) ? false : true;
   };
 
+  // simple toggler to add/remove a class that uses CSS3 transition to show/hide an element
   var toggler = function(handler,targ) {
     var elm = document.getElementById(targ);
     document.getElementById(handler).addEventListener('click',function(e){
@@ -22,8 +23,19 @@
   
   var accessSheet = (function() {
 
+    // I'm not using jQuery so the $ represents element IDs 
+    $loading = document.getElementById('loading');
+    $status = document.getElementById('status');
+    $un = document.getElementById('un');
+    $pw = document.getElementById('pw');
+    $add = document.getElementById('add');
+
     var Sheet = new GoogleSpreadsheet();
 
+    /*
+      This is the function that sends info to the contentscript.js
+      contentscripts is how a Chrome extensions interact with a website
+    */
     var sendDetails = function(un,pw){
       chrome.tabs.getSelected(null, function(tab) {
         chrome.tabs.sendMessage(tab.id, {password: pw,username: un}, function(response) {
@@ -32,13 +44,17 @@
       });
     };
 
+    /*
+      Searches through the spreadsheet data for the matching domain
+      returns array [username,password]
+    */
     var findPW = function(data,tabDomain) {
-      var data = data || {};
-      if (issetParam(data) && typeof data === 'object') {
-        for (prop in data) {
-          if (tabDomain.indexOf(data[prop].site) !== -1) {
+      var _data = data || {};
+      if (issetParam(_data) && typeof _data === 'object') {
+        for (var prop in _data) {
+          if (tabDomain.indexOf(_data[prop].site) !== -1) {
             var result = [];
-            result.push(data[prop].u,data[prop].pw);
+            result.push(_data[prop].u,_data[prop].pw);
             return result;
           }
         }
@@ -47,6 +63,9 @@
       }
     };
 
+    /*
+      Strips out a domain's hostname from a URL string
+    */
     var getDomain = function(tabUrl){
       // inspired by: http://stackoverflow.com/a/12470263
       var tUrl = tabUrl || "",
@@ -59,38 +78,42 @@
       }
     };
 
+    /*
+      Updates the status element ID and displays it
+    */
     var handleStatus = function(status,message) {
       var stat = status || '';
       var msg = message || '';
-      var statusElem = document.getElementById('status');
       if (stat !== '' && msg !== '') {
-        statusElem.textContent = msg;
-        statusElem.className = stat;
-        statusElem.style.display = "block";
+        $status.textContent = msg;
+        $status.className = stat;
+        $status.style.display = "block";
       }
     };
 
-    var updateUI = function(result){
-      if (issetParam(result)){
-        document.getElementById('un').textContent = result[0];
-        document.getElementById('pw').textContent = result[1];
-        sendDetails(result[0],result[1]);
-      } else {
-        console.warn('updateUI: results are null');
-      }
+    var onSuccess = function(result){
+      $loading.style.display = "none";
+      handleStatus('success','password found');
+      $un.textContent = result[0];
+      $pw.textContent = result[1];
+      sendDetails(result[0],result[1]);
+    };
+
+    var pwNotFound = function(){
+      $loading.style.display = "none";
+      handleStatus('error','password not found');
+      // show add new password message and display the form
     };
 
     var bindAdd = function(){
-      document.getElementById('add').addEventListener('click', function(evt) {
-        Sheet.add();
-        var a = setTimeout(function(){
-          var status = getResults();
-          if (status.success === false){
-            handleStatus('error',status.message);
+      $add.addEventListener('click', function(evt) {
+        Sheet.add(function(result){
+          if (result.success === false){
+            handleStatus('error',result.message);
           } else {
-            handleStatus('success', status.message);
+            handleStatus('success', result.message);
           }
-        },1000);
+        });
       },false);
     };
 
@@ -101,17 +124,21 @@
       }, function(tabs) {
         var tab = tabs[0];
         var activeUrl = getDomain(tab.url);
+        
         Sheet.init({
           sheet_url : localStorage['sheet_url'],
           tab_url : activeUrl
-        }).load(function(result){
+        });
+
+        Sheet.load(function(result){
           var found = findPW(result.sheetData,activeUrl);
           if (typeof found === 'undefined') {
-            handleStatus('error','password not found');
+            pwNotFound();
           } else {
-            updateUI(found);
+            onSuccess(found);
           }
         });
+
       });
       bindAdd();
     };
@@ -126,7 +153,7 @@
   
   document.addEventListener('DOMContentLoaded', function(e) {
     if (this.bDone) {
-      return; // deal with this being fired twice
+      return; // deal with DOMContentLoaded being fired twice for some reason
     }
     this.bDone = true;
     generate.init();
