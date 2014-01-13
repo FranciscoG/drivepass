@@ -84,6 +84,10 @@ input[type="checkbox"],
 #digits {
   width:20px;
 }
+.hover:hover {
+  cursor: pointer;
+}
+
 .hidden {
   height:0;
   overflow: hidden;

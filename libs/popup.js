@@ -1,18 +1,26 @@
 (function(){
 
-  var issetParam = function(a){
-    return (void 0===a || null===a) ? false : true;
+  /**
+   * Add or remove the css class "show"
+   * @param {object}  elm  - A DOM element 
+   */
+  var toggle = function(elm) {
+    if (elm.classList.contains("show")) {
+      elm.classList.remove('show');
+    } else {
+      elm.classList.add('show');
+    }
   };
 
-  // simple toggler to add/remove a class that uses CSS3 transition to show/hide an element
+  /**
+   * simple toggler to add/remove a class that uses CSS3 transition to show/hide an element
+   * @param  {string}   handler 
+   * @param  {string}   targ
+   */
   var toggler = function(handler,targ) {
     var elm = document.getElementById(targ);
     document.getElementById(handler).addEventListener('click',function(e){
-      if (elm.classList.contains("show")) {
-        elm.classList.remove('show');
-      } else {
-        elm.classList.add('show');
-      }
+      toggle(elm);
     },false);
   };
 
@@ -32,9 +40,11 @@
 
     var Sheet = new GoogleSpreadsheet();
 
-    /*
-      This is the function that sends info to the contentscript.js
-      contentscripts is how a Chrome extensions interact with a website
+   /**
+    * This is the function that sends info to the contentscript.js 
+    * contentscripts is how a Chrome extensions interact with a website
+    * @param  {string}   un  - usersname/login
+    * @param  {string}   pw  - password
     */
     var sendDetails = function(un,pw){
       chrome.tabs.getSelected(null, function(tab) {
@@ -44,13 +54,15 @@
       });
     };
 
-    /*
-      Searches through the spreadsheet data for the matching domain
-      returns array [username,password]
+   /**
+    * Searches through the spreadsheet data for the matching domain
+    * @param  {object}  data - json object
+    * @param  {string}  tabDomain
+    * @return {array}   [username,password]
     */
     var findPW = function(data,tabDomain) {
       var _data = data || {};
-      if (issetParam(_data) && typeof _data === 'object') {
+      if (Object.keys(_data).length) {
         for (var prop in _data) {
           if (tabDomain.indexOf(_data[prop].site) !== -1) {
             var result = [];
@@ -63,8 +75,10 @@
       }
     };
 
-    /*
-      Strips out a domain's hostname from a URL string
+   /**
+    * Strips out a domain's hostname from a URL string
+    * @param  {string}  tabUrl
+    * @return {string}
     */
     var getDomain = function(tabUrl){
       // inspired by: http://stackoverflow.com/a/12470263
@@ -78,9 +92,11 @@
       }
     };
 
-    /*
-      Updates the status element ID and displays it
-    */
+    /**
+     * Updates the status element ID and displays it
+     * @param  {string} status
+     * @param  {string} message
+     */
     var handleStatus = function(status,message) {
       var stat = status || '';
       var msg = message || '';
@@ -91,6 +107,10 @@
       }
     };
 
+    /**
+     * run on successful load of google spreadsheet
+     * @param  {object} result  - json object
+     */
     var onSuccess = function(result){
       $loading.style.display = "none";
       handleStatus('success','password found');
@@ -99,12 +119,19 @@
       sendDetails(result[0],result[1]);
     };
 
+    /**
+     * handle UI updates when password not found
+     */
     var pwNotFound = function(){
       $loading.style.display = "none";
       handleStatus('error','password not found');
-      // show add new password message and display the form
+      var $theInfo = document.getElementById('theInfo');
+      toggle($theInfo);
     };
 
+    /**
+     * bind the event listener that handles adding a new entry into the google spreadheet
+     */
     var bindAdd = function(){
       $add.addEventListener('click', function(evt) {
         Sheet.add(function(result){

@@ -4,10 +4,9 @@ var issetParam = function(a){
 
 var GoogleSpreadsheet = (function(){
 
-  var bgPage = chrome.extension.getBackgroundPage();
-
-  var _options = {};
-  var _response;
+  var bgPage = chrome.extension.getBackgroundPage(),
+      _options = {},
+      _response;
 
   var filterResults = function(response){
     var data = JSON.parse(response);
