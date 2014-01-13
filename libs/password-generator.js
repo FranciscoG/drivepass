@@ -1,11 +1,5 @@
 var Generator = (function(){
 
- 
-  var toggle = function(evt){
-    var gpOptions = document.getElementById('gpOptions');
-    gpOptions.className = (gpOptions.className === "toggled") ? "" : "toggled";
-  };
-
   var getValues = function(){
     var includeChar ='',
         count = 0,
@@ -44,7 +38,6 @@ var Generator = (function(){
   };
 
   var init = function(){
-    document.getElementById('showGPoptions').addEventListener('click',toggle,false);
     document.getElementById('makePassword').addEventListener('click',generatePassword,false);
   };
 

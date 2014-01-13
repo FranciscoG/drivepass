@@ -4,35 +4,41 @@ var issetParam = function(a){
 
 var GoogleSpreadsheet = (function(){
 
-  var bgPage = chrome.extension.getBackgroundPage();
+  var bgPage = chrome.extension.getBackgroundPage(),
+      _options = {},
+      _response;
 
-  var _options = {};
-  var _response;
+  var filterResults = function(response){
+    var data = JSON.parse(response);
+    var _i = 0,
+        _results = {},
+        _entries = data.feed.entry;
+    for (var prop in _entries) {
+      _results[_i] = {
+        site : _entries[prop].gsx$site.$t,
+        pw : _entries[prop].gsx$password.$t,
+        u : _entries[prop].gsx$username.$t
+      };
+      _i++;
+    }
+    return _results;
+  };
 
   var processLoad = function(response,xhr){
     if (xhr.status !== 200) {
       _response = {success:false, message: xhr.status + ": Connection Failed", on: "load"};
-      console.log(xhr);
+      console.warn(xhr);
     } else {
       _response = {success:true, message: 'spreadsheet successfully loaded', on: "load"};
-      var data = JSON.parse(response);
-      var _i = 0,
-          _results = {},
-          _entries = data.feed.entry;
-      for (prop in _entries) {
-        _results[_i] = {
-          site : _entries[prop].gsx$site.$t,
-          pw : _entries[prop].gsx$password.$t,
-          u : _entries[prop].gsx$username.$t
-        };
-        _i++;
-      }
-      _response.sheetData = _results;
+      _response.sheetData = filterResults(response);
     }
-    localStorage.setItem("result",JSON.stringify(_response));
+    if (_options.cb !== null) {
+      _options.cb(_response);
+    }
   };
 
-  var load = function() {
+  var load = function(cb) {
+    _options.cb = (typeof cb === "function") ? cb : null;
     var params = {
       'headers': {
         'GData-Version': '3.0'
@@ -43,6 +49,19 @@ var GoogleSpreadsheet = (function(){
       }
     };
     bgPage.oauth.sendSignedRequest(_options.jsonListUrl, processLoad, params);
+  };
+
+  var add = function(cb){
+    _options.cb = (typeof cb === "function") ? cb : null;
+    var params = {
+      'method': 'POST',
+      'headers': {
+        'GData-Version': '3.0',
+        'Content-Type': 'application/atom+xml'
+      },
+      'body': constructSpreadAtomXml_(_options.tab_url)
+    };
+    bgPage.oauth.sendSignedRequest(_options.jsonListUrl, processAdd, params);
   };
 
   var constructSpreadAtomXml_ = function(tabUrl) {
@@ -59,31 +78,20 @@ var GoogleSpreadsheet = (function(){
   var processAdd = function(response,xhr){
     if (xhr.status !== 201) {
       _response = {success:false, message: xhr.status + ": error saving", on: "add"};
-      console.log(xhr);
+      console.warn(xhr);
     } else {
-      _response = {success:true, message: 'saved', on: "add"};
+      _response = {success:true, message: 'password saved', on: "add"};
     }
-    localStorage.setItem("result",JSON.stringify(_response));
-  };
-  
-  var add = function(cb){
-    var params = {
-      'method': 'POST',
-      'headers': {
-        'GData-Version': '3.0',
-        'Content-Type': 'application/atom+xml'
-      },
-      'body': constructSpreadAtomXml_(_options.tab_url)
-    };
-
-    bgPage.oauth.sendSignedRequest(_options.jsonListUrl, processAdd, params);
+    if (_options.cb !== null) {
+      _options.cb(_response);
+    }
   };
 
   /*
     example usage and required parameters
     var spreadsheet = Googlespreadsheet.init({
       sheet_url : 'http://link.to.your?spreadsheet'
-      tab_url : 'www.blabla.com' //active tab url, on necessary for 'add' method
+      tab_url : 'www.blabla.com' //active tab url, only necessary for 'add' method
     })
 
     returns status object

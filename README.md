@@ -54,4 +54,6 @@ Copy and paste your private spreadsheet url into the options and click "save"
 
 credits:  
 Some google spreadsheet parsing taken (and then mangled) from:  
-https://github.com/mikeymckay/google-spreadsheet-javascript
+https://github.com/mikeymckay/google-spreadsheet-javascript  
+  
+256 AES Encryptions source: http://point-at-infinity.org/jsaes/

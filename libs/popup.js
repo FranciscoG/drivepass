@@ -1,13 +1,51 @@
 (function(){
 
-  var issetParam = function(a){
-    return (void 0===a || null===a) ? false : true;
+  /**
+   * Add or remove the css class "show"
+   * @param {object}  elm  - A DOM element 
+   */
+  var toggle = function(elm) {
+    if (elm.classList.contains("show")) {
+      elm.classList.remove('show');
+    } else {
+      elm.classList.add('show');
+    }
   };
 
+  /**
+   * simple toggler to add/remove a class that uses CSS3 transition to show/hide an element
+   * @param  {string}   handler 
+   * @param  {string}   targ
+   */
+  var toggler = function(handler,targ) {
+    var elm = document.getElementById(targ);
+    document.getElementById(handler).addEventListener('click',function(e){
+      toggle(elm);
+    },false);
+  };
+
+  var initUI = function(){
+    toggler('showGPoptions','gpOptions');
+    toggler('showInfo','theInfo');
+  };
+  
   var accessSheet = (function() {
+
+    // I'm not using jQuery so the $ represents element IDs 
+    $loading = document.getElementById('loading');
+    $status = document.getElementById('status');
+    $un = document.getElementById('un');
+    $pw = document.getElementById('pw');
+    $add = document.getElementById('add');
 
     var Sheet = new GoogleSpreadsheet();
 
+   /**
+    * This is the function that sends info to the contentscript.js 
+    * contentscripts is how a Chrome extensions interact with a website
+    * @param  {string}   un  - usersname/login
+    * @param  {string}   pw  - password
+    */
     var sendDetails = function(un,pw){
       chrome.tabs.getSelected(null, function(tab) {
         chrome.tabs.sendMessage(tab.id, {password: pw,username: un}, function(response) {
@@ -16,12 +54,19 @@
       });
     };
 
+   /**
+    * Searches through the spreadsheet data for the matching domain
+    * @param  {object}  data - json object
+    * @param  {string}  tabDomain
+    * @return {array}   [username,password]
+    */
     var findPW = function(data,tabDomain) {
-      if (issetParam(data) && typeof data === 'object') {
-        for (prop in data) {
-          if (tabDomain.indexOf(data[prop].site) !== -1) {
+      var _data = data || {};
+      if (Object.keys(_data).length) {
+        for (var prop in _data) {
+          if (tabDomain.indexOf(_data[prop].site) !== -1) {
             var result = [];
-            result.push(data[prop].u,data[prop].pw);
+            result.push(_data[prop].u,_data[prop].pw);
             return result;
           }
         }
@@ -29,63 +74,74 @@
         console.warn('findPW: data not an object');
       }
     };
+
+   /**
+    * Strips out a domain's hostname from a URL string
+    * @param  {string}  tabUrl
+    * @return {string}
+    */
     var getDomain = function(tabUrl){
-      if (issetParam(tabUrl)) {
-        var tabDomain,
-            finalDomain;
-        if (/http:/i.test(tabUrl)) {
-          tabDomain = tabUrl.split('http://');
-          finalDomain = tabDomain[1].split('/');
-        } else if (/https/i.test(tabUrl)) {
-          tabDomain = tabUrl.split('https://');
-          finalDomain = tabDomain[1].split('/');
-        } else {
-          finalDomain = tabDomain.split('/');
-        }
-        return finalDomain[0];
+      // inspired by: http://stackoverflow.com/a/12470263
+      var tUrl = tabUrl || "",
+          a = document.createElement('a');
+      if (tUrl !== ""){
+        a.href = tUrl;
+        return a['hostname'];
       } else {
-        console.warn('getDomain: url is null');
+        console.warn('tab url undefined');
       }
     };
 
+    /**
+     * Updates the status element ID and displays it
+     * @param  {string} status
+     * @param  {string} message
+     */
     var handleStatus = function(status,message) {
       var stat = status || '';
       var msg = message || '';
-      var statusElem = document.getElementById('status');
       if (stat !== '' && msg !== '') {
-        statusElem.textContent = msg;
-        statusElem.className = stat;
-        statusElem.style.display = "block";
+        $status.textContent = msg;
+        $status.className = stat;
+        $status.style.display = "block";
       }
     };
 
-    var updateUI = function(result){
-      if (issetParam(result)){
-        document.getElementById('un').textContent = result[0];
-        document.getElementById('pw').textContent = result[1];
-        sendDetails(result[0],result[1]);
-      } else {
-        console.warn('updateUI: results are null');
-      }
+    /**
+     * run on successful load of google spreadsheet
+     * @param  {object} result  - json object
+     */
+    var onSuccess = function(result){
+      $loading.style.display = "none";
+      handleStatus('success','password found');
+      $un.textContent = result[0];
+      $pw.textContent = result[1];
+      sendDetails(result[0],result[1]);
     };
 
+    /**
+     * handle UI updates when password not found
+     */
+    var pwNotFound = function(){
+      $loading.style.display = "none";
+      handleStatus('error','password not found');
+      var $theInfo = document.getElementById('theInfo');
+      toggle($theInfo);
+    };
+
+    /**
+     * bind the event listener that handles adding a new entry into the google spreadheet
+     */
     var bindAdd = function(){
-      document.getElementById('add').addEventListener('click', function(evt) {
-        Sheet.add();
-        var a = setTimeout(function(){
-          var status = getResults();
-          if (status.success === false){
-            handleStatus('error',status.message);
+      $add.addEventListener('click', function(evt) {
+        Sheet.add(function(result){
+          if (result.success === false){
+            handleStatus('error',result.message);
           } else {
-            handleStatus('success', status.message);
+            handleStatus('success', result.message);
           }
-        },1000);
+        });
       },false);
-    };
-
-    var getResults = function(){
-      var results = localStorage.getItem('result');
-      return JSON.parse(results);
     };
 
     var init = function() {
@@ -95,17 +151,21 @@
       }, function(tabs) {
         var tab = tabs[0];
         var activeUrl = getDomain(tab.url);
+        
         Sheet.init({
           sheet_url : localStorage['sheet_url'],
           tab_url : activeUrl
-        }).load();
-        var status = getResults();
-        var found = findPW(status.sheetData,activeUrl);
-        if (typeof found === 'undefined') {
-          handleStatus('error','password not found');
-        } else {
-          updateUI(found);
-        }
+        });
+
+        Sheet.load(function(result){
+          var found = findPW(result.sheetData,activeUrl);
+          if (typeof found === 'undefined') {
+            pwNotFound();
+          } else {
+            onSuccess(found);
+          }
+        });
+
       });
       bindAdd();
     };
@@ -120,11 +180,12 @@
   
   document.addEventListener('DOMContentLoaded', function(e) {
     if (this.bDone) {
-      return;
+      return; // deal with DOMContentLoaded being fired twice for some reason
     }
     this.bDone = true;
     generate.init();
     access.init();
+    initUI();
   });
 
 })();

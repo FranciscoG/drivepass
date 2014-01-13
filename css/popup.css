@@ -26,6 +26,9 @@ span {
   text-transform: uppercase;
   text-align: center;
 }
+.button:hover {
+  cursor:pointer;
+}
 #pw {
   color:#efefef;
 }
@@ -73,19 +76,73 @@ label {
     min-height:20px;
     overflow:hidden;
 }
-input[type="checkbox"], #digits {
+input[type="checkbox"], 
+#digits {
   float: left;
   margin-right:5px;
 }
 #digits {
   width:20px;
 }
-#gpOptions {
+.hover:hover {
+  cursor: pointer;
+}
+
+.hidden {
   height:0;
   overflow: hidden;
   transition: height .3s linear;
 }
-
-.toggled {
+.hidden.show {
   height: auto !important;
+}
+
+/*
+  CSS3 Spinner source: http://codepen.io/lixonic/pen/zfrFj
+*/
+.spinner{
+  border-radius:50%;
+  border:5px dashed #426BB8;
+  display:table;
+  margin:auto;
+  -webkit-animation: rotate-right 2s infinite;
+ 
+}
+.spinner:before{
+  content:"";
+  display:table;
+  border:10px groove #4278DB;
+  border-radius:50%; 
+  -webkit-animation: rotate-left 1s infinite;
+ 
+}
+@-webkit-keyframes rotate-left
+{
+  from { -webkit-transform: rotate(0deg);}
+  to {-webkit-transform: rotate(-360deg);}
+}
+@-webkit-keyframes rotate-right
+{
+  from { -webkit-transform: rotate(0deg);}
+  to {-webkit-transform: rotate(360deg);}
+}
+
+/*
+my codepen for this
+http://codepen.io/anon/pen/Bwyhd
+*/
+.line {
+  width:1px;
+  height:100%;
+  background: blue;
+  position:absolute;
+  z-index:1;
+  top:0;
+  right:100%;
+  -webkit-animation: move-right ease 0.7s infinite alternate;
+}
+
+@-webkit-keyframes move-right {
+  from { left: 0; }
+  to { right: 0; }
 }

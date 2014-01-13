@@ -1,11 +1,14 @@
 (function(){
 
-  var focused,passwordInput=[];
-
+  var focused,
+      passwordInput=[];
+  
+  // grab the focused input which should be the username field
   var getFocused = function() {
     focused = document.activeElement.id;
   };
   
+  // grab all inputs and find all that are type=password 
   var nodes = document.getElementsByTagName('input');
 
   for (var i=0;i<nodes.length;i++) {
