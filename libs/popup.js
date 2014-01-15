@@ -117,6 +117,7 @@
       $un.textContent = result[0];
       $pw.textContent = result[1];
       sendDetails(result[0],result[1]);
+      $add.textContent = "update";
     };
 
     /**
