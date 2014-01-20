@@ -97,6 +97,10 @@ input[type="checkbox"],
   height: auto !important;
 }
 
+.hide {
+  display: none;
+}
+
 /*
   CSS3 Spinner source: http://codepen.io/lixonic/pen/zfrFj
 */

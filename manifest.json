@@ -1,12 +1,12 @@
 {
   "manifest_version": 2,
 
-  "name": "password manager",
-  "description": "This extension fetches a passwords from a google spreadsheet api",
+  "name": "Drive Pass",
+  "description": "This extension fetches a password from a google spreadsheet using oAuth and the Google Drive api",
   "version": "1.0",
 
   "browser_action": {
-    "default_icon": "assets/icon.png",
+    "default_icon": "assets/drive-pass19.png",
     "default_popup": "popup.html"
   },
   "background": {

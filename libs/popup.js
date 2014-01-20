@@ -1,50 +1,28 @@
 (function(){
 
-  /**
-   * Add or remove the css class "show"
-   * @param {object}  elm  - A DOM element 
-   */
-  var toggle = function(elm) {
-    if (elm.classList.contains("show")) {
-      elm.classList.remove('show');
-    } else {
-      elm.classList.add('show');
-    }
-  };
-
-  /**
-   * simple toggler to add/remove a class that uses CSS3 transition to show/hide an element
-   * @param  {string}   handler 
-   * @param  {string}   targ
-   */
-  var toggler = function(handler,targ) {
-    var elm = document.getElementById(targ);
-    document.getElementById(handler).addEventListener('click',function(e){
-      toggle(elm);
-    },false);
-  };
-
   var initUI = function(){
-    toggler('showGPoptions','gpOptions');
-    toggler('showInfo','theInfo');
+    utils.toggler('showGPoptions','gpOptions');
+    utils.toggler('showInfo','theInfo');
   };
   
   var accessSheet = (function() {
 
-    // I'm not using jQuery so the $ represents element IDs 
-    $loading = document.getElementById('loading');
-    $status = document.getElementById('status');
-    $un = document.getElementById('un');
-    $pw = document.getElementById('pw');
-    $add = document.getElementById('add');
+    // caching DOM elements
+    // I'm not using jQuery so the $ represents element IDs only
+    var $loading = document.getElementById('loading'),
+        $status = document.getElementById('status'),
+        $un = document.getElementById('un'),
+        $pw = document.getElementById('pw'),
+        $add = document.getElementById('add'),
+        $theInfo = document.getElementById('theInfo');
 
     var Sheet = new GoogleSpreadsheet();
 
    /**
     * This is the function that sends info to the contentscript.js 
-    * contentscripts is how a Chrome extensions interact with a website
-    * @param  {string}   un  - usersname/login
-    * @param  {string}   pw  - password
+    * contentscripts is how a Chrome extensions interacts with a website
+    * @param  {string}   un  - a usersname/login
+    * @param  {string}   pw  - a password
     */
     var sendDetails = function(un,pw){
       chrome.tabs.getSelected(null, function(tab) {
@@ -126,8 +104,7 @@
     var pwNotFound = function(){
       $loading.style.display = "none";
       handleStatus('error','password not found');
-      var $theInfo = document.getElementById('theInfo');
-      toggle($theInfo);
+      utils.toggle($theInfo);
     };
 
     /**
@@ -146,6 +123,9 @@
     };
 
     var init = function() {
+      // chrome.tabs.query allows us to interact with current open tabs
+      // I'm using it to grab the url of the active tab
+      // it's asynchronous and can be passed a callback function
       chrome.tabs.query({
         active: true,
         lastFocusedWindow: true

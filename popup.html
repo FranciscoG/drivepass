@@ -39,7 +39,10 @@
             <input type="checkbox" id="numbers" value="0123456789" checked />0-9
           </label>
           <label>
-            <input type="checkbox" id="symbols" value="#_@." />symbols
+            <input type="checkbox" id="show_symbols" />symbols
+          </label>
+          <label id="hidden_symbols" class="hide">
+            <input type="text" id="symbols" value="#_@." />
           </label>
           <label>
             <input type="button" id="makePassword" value="generate" />
@@ -47,6 +50,7 @@
         </div>
       </div>
     </div>
+    <script src="libs/utils.js"></script>
     <script src="libs/googlespreadsheet.js"></script>
     <script src="libs/password-generator.js"></script>
     <script src="libs/popup.js"></script>
