@@ -3,6 +3,7 @@
   var initUI = function(){
     utils.toggler('showGPoptions','gpOptions');
     utils.toggler('showInfo','theInfo');
+    utils.toggler('show_symbols','hidden_symbols');
   };
   
   var accessSheet = (function() {

@@ -5,7 +5,7 @@ var oauth = ChromeExOAuth.initBackgroundPage({
   'consumer_key': 'anonymous',
   'consumer_secret': 'anonymous',
   'scope': 'https://spreadsheets.google.com/feeds/',
-  'app_name': 'PassSheets Extension'
+  'app_name': 'Drive Pass Chrome Extension'
 });
 
 
