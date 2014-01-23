@@ -97,6 +97,7 @@
       $pw.textContent = result[1];
       sendDetails(result[0],result[1]);
       $add.textContent = "update";
+      chrome.browserAction.setIcon({path: 'assets/drive-pass19.png'});
     };
 
     /**
@@ -106,6 +107,7 @@
       $loading.style.display = "none";
       handleStatus('error','password not found');
       utils.toggle($theInfo);
+      chrome.browserAction.setIcon({path: 'assets/drive-pass19.png'});
     };
 
     /**
@@ -157,6 +159,29 @@
     };
   });
 
+  var animateIcon = function(){
+    var i = 0;
+    
+    var drawing = window.setInterval(function() {
+      i++;
+      chrome.browserAction.setIcon({imageData: draw(i*2, i*4)});
+      if (i ===30) {clearInterval(drawing);}
+    }, 50);
+
+    function draw(starty, startx) {
+      var canvas = document.getElementById('canvas');
+      var context = canvas.getContext('2d');
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "rgba(0,200,0,255)";
+      context.fillRect(startx % 19, starty % 19, 8, 8);
+      context.fillStyle = "rgba(0,0,200,255)";
+      context.fillRect((startx + 5) % 19, (starty + 5) % 19, 8, 8);
+      context.fillStyle = "rgba(200,0,0,255)";
+      context.fillRect((startx + 10) % 19, (starty + 10) % 19, 8, 8);
+      return context.getImageData(0, 0, 19, 19);
+    }
+  };
+
   var access = new accessSheet();
   var generate = new Generator();
   
@@ -164,6 +189,7 @@
     if (this.bDone) {
       return; // deal with DOMContentLoaded being fired twice for some reason
     }
+    animateIcon();
     this.bDone = true;
     generate.init();
     access.init();
