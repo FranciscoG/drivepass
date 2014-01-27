@@ -1,5 +1,7 @@
 (function(){
 
+  var drawing;
+
   var initUI = function(){
     utils.toggler('showGPoptions','gpOptions');
     utils.toggler('showInfo','theInfo');
@@ -91,23 +93,25 @@
      * @param  {object} result  - json object
      */
     var onSuccess = function(result){
+      clearInterval(drawing);
+      chrome.browserAction.setIcon({path: 'assets/drive-pass19.png'});
       $loading.style.display = "none";
       handleStatus('success','password found');
       $un.textContent = result[0];
       $pw.textContent = result[1];
       sendDetails(result[0],result[1]);
       $add.textContent = "update";
-      chrome.browserAction.setIcon({path: 'assets/drive-pass19.png'});
     };
 
     /**
      * handle UI updates when password not found
      */
     var pwNotFound = function(){
+      clearInterval(drawing);
+      chrome.browserAction.setIcon({path: 'assets/drive-pass19.png'});
       $loading.style.display = "none";
       handleStatus('error','password not found');
       utils.toggle($theInfo);
-      chrome.browserAction.setIcon({path: 'assets/drive-pass19.png'});
     };
 
     /**
@@ -162,22 +166,25 @@
   var animateIcon = function(){
     var i = 0;
     
-    var drawing = window.setInterval(function() {
+    drawing = window.setInterval(function() {
       i++;
-      chrome.browserAction.setIcon({imageData: draw(i*2, i*4)});
-      if (i ===30) {clearInterval(drawing);}
-    }, 50);
+      chrome.browserAction.setIcon({imageData: drawCircle(i)});
+      if (i ===200) {clearInterval(drawing);}
+    }, 100);
 
-    function draw(starty, startx) {
-      var canvas = document.getElementById('canvas');
-      var context = canvas.getContext('2d');
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+
+    function drawCircle(x){
       context.clearRect(0, 0, canvas.width, canvas.height);
-      context.fillStyle = "rgba(0,200,0,255)";
-      context.fillRect(startx % 19, starty % 19, 8, 8);
-      context.fillStyle = "rgba(0,0,200,255)";
-      context.fillRect((startx + 5) % 19, (starty + 5) % 19, 8, 8);
-      context.fillStyle = "rgba(200,0,0,255)";
-      context.fillRect((startx + 10) % 19, (starty + 10) % 19, 8, 8);
+      context.beginPath();
+      var half = canvas.width / 2;
+      var start = x;
+      var end = Math.PI + x;
+      context.arc(half, half, half, start, end, false);
+      context.closePath();
+      context.fillStyle = 'blue';
+      context.fill();
       return context.getImageData(0, 0, 19, 19);
     }
   };
