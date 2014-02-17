@@ -1,6 +1,5 @@
 (function(){
 
-  var drawing;
 
   var initUI = function(){
     utils.toggler('showGPoptions','gpOptions');
@@ -17,7 +16,8 @@
         $un = document.getElementById('un'),
         $pw = document.getElementById('pw'),
         $add = document.getElementById('add'),
-        $theInfo = document.getElementById('theInfo');
+        $theInfo = document.getElementById('theInfo'),
+        activeUrl;
 
     var Sheet = new GoogleSpreadsheet();
 
@@ -47,7 +47,7 @@
         for (var prop in _data) {
           if (tabDomain.indexOf(_data[prop].site) !== -1) {
             var result = [];
-            result.push(_data[prop].u,_data[prop].pw);
+            result.push(_data[prop].username,_data[prop].password);
             return result;
           }
         }
@@ -93,8 +93,6 @@
      * @param  {object} result  - json object
      */
     var onSuccess = function(result){
-      clearInterval(drawing);
-      chrome.browserAction.setIcon({path: 'assets/drive-pass19.png'});
       $loading.style.display = "none";
       handleStatus('success','password found');
       $un.textContent = result[0];
@@ -107,8 +105,6 @@
      * handle UI updates when password not found
      */
     var pwNotFound = function(){
-      clearInterval(drawing);
-      chrome.browserAction.setIcon({path: 'assets/drive-pass19.png'});
       $loading.style.display = "none";
       handleStatus('error','password not found');
       utils.toggle($theInfo);
@@ -119,7 +115,10 @@
      */
     var bindAdd = function(){
       $add.addEventListener('click', function(evt) {
-        Sheet.add(function(result){
+        var un = document.getElementById('un').textContent;
+        var pw = document.getElementById('pw').textContent;
+        var data = [activeUrl,un,pw];
+        Sheet.add(data,function(result){
           if (result.success === false){
             handleStatus('error',result.message);
           } else {
@@ -138,11 +137,11 @@
         lastFocusedWindow: true
       }, function(tabs) {
         var tab = tabs[0];
-        var activeUrl = getDomain(tab.url);
+        activeUrl = getDomain(tab.url);
         
         Sheet.init({
           sheet_url : localStorage['sheet_url'],
-          tab_url : activeUrl
+          columns : ['site','username','password']
         });
 
         Sheet.load(function(result){
@@ -163,31 +162,7 @@
     };
   });
 
-  var animateIcon = function(){
-    var i = 0;
-    
-    drawing = window.setInterval(function() {
-      i++;
-      chrome.browserAction.setIcon({imageData: drawCircle(i)});
-      if (i ===200) {clearInterval(drawing);}
-    }, 100);
 
-    var canvas = document.getElementById('canvas');
-    var context = canvas.getContext('2d');
-
-    function drawCircle(x){
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.beginPath();
-      var half = canvas.width / 2;
-      var start = x;
-      var end = Math.PI + x;
-      context.arc(half, half, half, start, end, false);
-      context.closePath();
-      context.fillStyle = 'blue';
-      context.fill();
-      return context.getImageData(0, 0, 19, 19);
-    }
-  };
 
   var access = new accessSheet();
   var generate = new Generator();
@@ -196,7 +171,6 @@
     if (this.bDone) {
       return; // deal with DOMContentLoaded being fired twice for some reason
     }
-    animateIcon();
     this.bDone = true;
     generate.init();
     access.init();
