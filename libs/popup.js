@@ -22,7 +22,7 @@
     var Sheet = new GoogleSpreadsheet();
 
    /**
-    * This is the function that sends info to the contentscript.js 
+    * Sends info to contentscript.js 
     * contentscripts is how a Chrome extensions interacts with a website
     * @param  {string}   un  - a usersname/login
     * @param  {string}   pw  - a password
@@ -53,23 +53,6 @@
         }
       } else {
         console.warn('findPW: data not an object');
-      }
-    };
-
-   /**
-    * Strips out a domain's hostname from a URL string
-    * @param  {string}  tabUrl
-    * @return {string}
-    */
-    var getDomain = function(tabUrl){
-      // inspired by: http://stackoverflow.com/a/12470263
-      var tUrl = tabUrl || "",
-          a = document.createElement('a');
-      if (tUrl !== ""){
-        a.href = tUrl;
-        return a['hostname'];
-      } else {
-        console.warn('tab url undefined');
       }
     };
 
@@ -137,7 +120,7 @@
         lastFocusedWindow: true
       }, function(tabs) {
         var tab = tabs[0];
-        activeUrl = getDomain(tab.url);
+        activeUrl = utils.getHostname(tab.url);
         
         Sheet.init({
           sheet_url : localStorage['sheet_url'],

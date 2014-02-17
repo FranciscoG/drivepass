@@ -1,6 +1,6 @@
 var utils = {
   /**
-   * Add or remove the css class "show"
+   * Add or remove the css class "show" from a DOM element
    * @param {object}  elm  - A DOM element 
    */
   toggle: function(elm) {
@@ -10,6 +10,7 @@ var utils = {
       elm.classList.add('show');
     }
   },
+  
   /**
    * simple toggler to add/remove a class that uses CSS3 transition to show/hide an element
    * @param  {string}   handler 
@@ -21,5 +22,25 @@ var utils = {
     document.getElementById(handler).addEventListener('click',function(e){
       that.toggle(elm);
     },false);
+  },
+
+  /**
+    * gets the hostname from a URL string
+    * @param  {string}  a full url
+    * @return {string}
+    */
+  getHostname: function(url){
+    // letting the browser give me the hostname, easier than a regex
+    // inspired by: http://stackoverflow.com/a/12470263
+    var _url = url || "",
+        a = document.createElement('a');
+    if (_url !== ""){
+      a.href = _url;
+      return a['hostname'];
+    } else {
+      console.warn('url undefined');
+      return false;
+    }
   }
+
 };
