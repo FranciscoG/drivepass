@@ -31,7 +31,7 @@ module.exports = function(grunt){
           { expand: true, cwd: 'modules/build', src: ['drivepass.*'], dest: 'Chrome/js'},
           // copying the css that would be used by all 
           { expand: true, cwd: 'modules/css', src: ['**'], dest: 'Chrome/css'},
-          // copying images that might be uses by all browser extensions
+          // copying images that might be used by all browser extensions
           { expand: true, cwd: 'modules/img', src: ['**'], dest: 'Chrome/img'}
         ]
       }

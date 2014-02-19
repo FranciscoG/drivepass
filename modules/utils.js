@@ -44,3 +44,39 @@ var utils = {
   }
 
 };
+
+
+/*  example of JS router
+http://collectiveidea.com/blog/archives/2012/01/25/standalone-javascript-routing/
+
+var Router;
+
+Router = (function() {
+  function Router() {}
+
+  Router.add = function(path, callback) {
+    this.routes || (this.routes = []);
+    return this.routes.push({
+      path: new RegExp(path.replace(/\//g, "\\/").replace(/:(\w*)/g, "(\\w*)")),
+      callback: callback
+    });
+  };
+
+  Router.process = function() {
+    var params, route, _i, _len, _ref;
+    _ref = this.routes;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      route = _ref[_i];
+      params = window.location.pathname.match(route.path);
+      if (params != null) {
+        route.callback(params);
+        return;
+      }
+    }
+  };
+
+  return Router;
+
+})();
+
+*/

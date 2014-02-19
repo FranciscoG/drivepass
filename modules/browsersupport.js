@@ -1,5 +1,6 @@
 /* 
- * 
+ * This is the funnel for all browser related interactions
+ * right now it only handles Chrome, in the futre it will also handle FireFox
 */
 
 var DrivePass = DrivePass || {};
