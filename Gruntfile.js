@@ -1,3 +1,6 @@
+var libs = [
+  'modules/libs/ply.core.js'
+];
 
 var myscripts = [
   'modules/utils.js',
@@ -28,7 +31,7 @@ module.exports = function(grunt){
     
     watch: {
       js: {
-        files: [myscripts], tasks: ['jshint','concat','uglify','copy']
+        files: [libs, myscripts], tasks: ['jshint','concat','uglify','copy']
       }
     },
 
@@ -49,7 +52,8 @@ module.exports = function(grunt){
         globals: {
           DrivePass : true,
           chrome : true,
-          utils : true
+          utils : true,
+          Ply : true
         }
       },
       gruntfile: {
@@ -62,7 +66,7 @@ module.exports = function(grunt){
 
     concat: {
       build: {
-        files: { 'modules/drivepass.js': [myscripts] }
+        files: { 'modules/drivepass.js': [libs, myscripts] }
       }
     },
 

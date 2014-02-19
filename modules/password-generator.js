@@ -45,6 +45,7 @@ DrivePass.Generator = (function(){
     retVal += vals[2];
     $pw.textContent = retVal;
     $pw.className = "generated";
+    return true;
   };
 
   var init = function(){

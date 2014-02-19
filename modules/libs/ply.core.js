@@ -1,4 +1,4 @@
-/*global Ply, jQuery */
+/*global Ply */
 /*jshint bitwise: true, camelcase: true, curly: true, eqeqeq: true, forin: true,
 immed: true, indent: 4, latedef: true, newcap: true, nonew: true, quotmark: single,
 undef: true, unused: true, strict: true, trailing: true, browser: true */

@@ -114,8 +114,7 @@ DrivePass.GoogleSpreadsheet = (function(){
   var init = function(options) {
     _options = options || {};
 
-    if (typeof _options.sheet_url !== 'string' || 
-        typeof _options.columns !== 'object') {
+    if (typeof _options.sheet_url !== 'string' || typeof _options.columns !== 'object') {
       throw new Error('Missing sheet_url or columns from init options');
     }
 

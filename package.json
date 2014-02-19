@@ -3,7 +3,6 @@
   "version": "0.0.0-ignored",
   "Gruntfile": "Gruntfile.js",
   "devDependencies": {
-    "grunt-cli" : "~0.1.11",
     "grunt":      "~0.4.1",
     "grunt-contrib-jshint": "*",
     "grunt-contrib-concat": "*",
