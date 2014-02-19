@@ -2,8 +2,7 @@ var DrivePass = DrivePass || {};
 
 DrivePass.GoogleSpreadsheet = (function(){
 
-  var bgPage = chrome.extension.getBackgroundPage(),
-      _options = {},
+  var _options = {},
       _response;
 
   var filterResults = function(response){
@@ -49,7 +48,7 @@ DrivePass.GoogleSpreadsheet = (function(){
         'showfolders': 'true'
       }
     };
-    bgPage.oauth.sendSignedRequest(_options.jsonListUrl, processLoad, params);
+    DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl, processLoad, params);
   };
 
   /**
@@ -67,7 +66,7 @@ DrivePass.GoogleSpreadsheet = (function(){
       },
       'body': constructSpreadAtomXml_(data)
     };
-    bgPage.oauth.sendSignedRequest(_options.jsonListUrl, processAdd, params);
+    DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl, processAdd, params);
   };
 
   /**
