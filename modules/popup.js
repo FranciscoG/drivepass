@@ -15,20 +15,6 @@ DrivePass.Popup = (function() {
   var Sheet = new DrivePass.GoogleSpreadsheet();
 
  /**
-  * Sends info to contentscript.js 
-  * contentscripts is how a Chrome extensions interacts with a website
-  * @param  {string}   un  - a usersname/login
-  * @param  {string}   pw  - a password
-  */
-  var sendDetails = function(un,pw){
-    chrome.tabs.getSelected(null, function(tab) {
-      chrome.tabs.sendMessage(tab.id, {password: pw,username: un}, function(response) {
-        console.log(response.dom);
-      });
-    });
-  };
-
- /**
   * Searches through the spreadsheet data for the matching domain
   * @param  {object}  data - json object
   * @param  {string}  tabDomain
@@ -73,7 +59,9 @@ DrivePass.Popup = (function() {
     handleStatus('success','password found');
     $un.textContent = result[0];
     $pw.textContent = result[1];
-    sendDetails(result[0],result[1]);
+    
+    DrivePass.Browser.sendToPage({username: result[0], password: result[1]});
+    
     $add.textContent = "update";
   };
 
@@ -104,32 +92,27 @@ DrivePass.Popup = (function() {
     },false);
   };
 
-  var init = function() {
-    // chrome.tabs.query allows us to interact with current open tabs
-    // I'm using it to grab the url of the active tab
-    // it's asynchronous and can be passed a callback function
-    chrome.tabs.query({
-      active: true,
-      lastFocusedWindow: true
-    }, function(tabs) {
-      var tab = tabs[0];
-      activeUrl = utils.getHostname(tab.url);
-      
-      Sheet.init({
-        sheet_url : localStorage['sheet_url'],
-        columns : ['site','username','password']
-      });
-
-      Sheet.load(function(result){
-        var found = findPW(result.sheetData,activeUrl);
-        if (typeof found === 'undefined') {
-          pwNotFound();
-        } else {
-          onSuccess(found);
-        }
-      });
-
+  var initCb = function(){
+    
+    Sheet.init({
+      sheet_url : localStorage['sheet_url'],
+      columns : ['site','username','password']
     });
+
+    Sheet.load(function(result){
+      activeUrl = DrivePass.Browser.activeTabUrl;
+      var found = findPW(result.sheetData,activeUrl);
+      if (typeof found === 'undefined') {
+        pwNotFound();
+      } else {
+        onSuccess(found);
+      }
+    });
+    
+  };
+
+  var init = function() {
+    DrivePass.Browser.getActiveTab(initCb);
     bindAdd();
   };
 

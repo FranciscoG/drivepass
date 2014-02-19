@@ -4,6 +4,7 @@ var libs = [
 
 var myscripts = [
   'modules/utils.js',
+  'modules/browsersupport.js',
   'modules/googlespreadsheet.js',
   'modules/password-generator.js',
   'modules/popup.js',
@@ -25,7 +26,14 @@ module.exports = function(grunt){
     
     copy: {
       chrome: {
-        files: [{ expand: true, cwd: 'modules/', src: ['drivepass.*'], dest: 'chrome/js'}]
+        files: [
+          // just copying the concatenated and minified files
+          { expand: true, cwd: 'modules/build', src: ['drivepass.*'], dest: 'Chrome/js'},
+          // copying the css that would be used by all 
+          { expand: true, cwd: 'modules/css', src: ['**'], dest: 'Chrome/css'},
+          // copying images that might be uses by all browser extensions
+          { expand: true, cwd: 'modules/img', src: ['**'], dest: 'Chrome/img'}
+        ]
       }
     },
     
@@ -60,7 +68,7 @@ module.exports = function(grunt){
         src: 'Gruntfile.js'
       },
       src: {
-        src: [myscripts]
+        src: [myscripts] // only going to hint myscripts and not 3rd party libs
       }
     },
 
