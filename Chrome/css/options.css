@@ -1,0 +1,37 @@
+body {
+  padding:0;
+  margin:0;
+  font-family: sans-serif;
+}
+.container {
+  width:900px;
+  margin:50px auto;
+  padding:20px;
+}
+#sheet_url {
+  width: 100%;
+  box-sizing:border-box;
+  height:30px;
+  padding:10px;
+  font-size: 14px;
+  margin-bottom:20px;
+}
+#save {
+  background: gray;
+  color:white;
+  text-align: center;
+  width:200px;
+  display: block;
+  padding:20px 0;
+  text-transform: uppercase;
+}
+#save:hover {
+  background: #000;
+}
+#status {
+  
+}
+#goToSheet {
+  display: none;
+  margin-top: 10px;
+}

@@ -8,7 +8,11 @@ var oauth = ChromeExOAuth.initBackgroundPage({
   'app_name': 'Drive Pass Chrome Extension'
 });
 
-
+/**
+ * oAuth callback function, updates the UI.  Very minimal, more designed page to come
+ * @param  {string}   resp : the respnse string sent by the oAuth extension when successfully authorized
+ * @param  {object}   xhr  : the ajax response object with http code, etc
+ */
 function callback(resp, xhr) {
   docBody = document.getElementsByTagName('body');
   docBody.innerHTML = resp;
@@ -26,6 +30,9 @@ function onAuthorized() {
 
 oauth.authorize(onAuthorized);
 
+/**
+ * Shows the options page to the user if they haven't added their spreadsheet url yet
+ */
 if (!localStorage['sheet_url']) {
   chrome.tabs.create({url: "options.html"});
 }

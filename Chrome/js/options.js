@@ -11,7 +11,7 @@
   function restore_options() {
     var curr_url = localStorage["sheet_url"];
     if (!curr_url || curr_url === "") {
-      return;
+      return false;
     } else {
       document.getElementById("sheet_url").value = curr_url;
       document.getElementById("save").textContent = "update";

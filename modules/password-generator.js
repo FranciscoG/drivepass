@@ -1,4 +1,6 @@
-var Generator = (function(){
+var DrivePass = DrivePass || {};
+
+DrivePass.Generator = (function(){
   var $uc = document.getElementById('uppercase'),
       $lc = document.getElementById('lowercase'),
       $nums = document.getElementById('numbers'),

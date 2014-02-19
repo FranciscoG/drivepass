@@ -17,10 +17,10 @@ var utils = {
    * @param  {string}   targ
    */
   toggler: function(handler,targ) {
-    var that = this;
+    var self = this;
     var elm = document.getElementById(targ);
     document.getElementById(handler).addEventListener('click',function(e){
-      that.toggle(elm);
+      self.toggle(elm);
     },false);
   },
 

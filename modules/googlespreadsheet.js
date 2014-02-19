@@ -1,4 +1,6 @@
-var GoogleSpreadsheet = (function(){
+var DrivePass = DrivePass || {};
+
+DrivePass.GoogleSpreadsheet = (function(){
 
   var bgPage = chrome.extension.getBackgroundPage(),
       _options = {},
@@ -33,7 +35,7 @@ var GoogleSpreadsheet = (function(){
     if (_options.cb !== null) {
       _options.cb(_response);
     }
-    return _response
+    return _response;
   };
 
   var load = function(cb) {
