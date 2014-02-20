@@ -10,9 +10,20 @@ DrivePass.Popup = (function() {
       $pw = document.getElementById('pw'),
       $add = document.getElementById('add'),
       $theInfo = document.getElementById('theInfo'),
+      theData = JSON.parse(localStorage.getItem('_data')),
       activeUrl;
 
   var Sheet = new DrivePass.GoogleSpreadsheet();
+
+  Sheet.init({
+    sheet_url : localStorage['sheet_url'],
+    columns : ['site','username','password']
+  });
+
+  if (theData === null) {
+    Sheet.load();
+    theData = JSON.parse(localStorage.getItem('_data'));
+  }
 
  /**
   * Searches through the spreadsheet data for the matching domain
@@ -93,21 +104,14 @@ DrivePass.Popup = (function() {
   };
 
   var initCb = function(){
-    
-    Sheet.init({
-      sheet_url : localStorage['sheet_url'],
-      columns : ['site','username','password']
-    });
 
-    Sheet.load(function(result){
-      activeUrl = DrivePass.Browser.activeTabUrl;
-      var found = findPW(result.sheetData,activeUrl);
-      if (typeof found === 'undefined') {
-        pwNotFound();
-      } else {
-        onSuccess(found);
-      }
-    });
+    activeUrl = DrivePass.Browser.activeTabUrl;
+    var found = findPW(theData.sheetData,activeUrl);
+    if (typeof found === 'undefined') {
+      pwNotFound();
+    } else {
+      onSuccess(found);
+    }
     
   };
 

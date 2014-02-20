@@ -5,6 +5,7 @@
 * I'm placing the route for the document as a data attribute of the body tag
 * <body data-route="popup">
 * it then looks for the function that matches that route and runs it
+*
 */
 
 var DrivePass = DrivePass || {};
@@ -16,12 +17,15 @@ DrivePass.Router = (function() {
   }
 
   Router.prototype.process = function() {
-    var route = document.body.dataset.route;
     // always run what's in 'universal' before other routes
     this.methods.universal(); 
-    var theRoute = this.methods[route];
-    if (typeof theRoute === 'function') { 
-      theRoute(); 
+    var route = document.body.dataset.route;
+    // only want to process defined routes
+    if (typeof route !== 'undefined') {
+      var execRoute = this.methods[route];
+      if (typeof execRoute === 'function') { 
+        execRoute(); 
+      }
     }
   };
 

@@ -31,6 +31,7 @@ DrivePass.GoogleSpreadsheet = (function(){
       _response = {success:true, message: 'spreadsheet successfully loaded'};
       _response.sheetData = filterResults(response);
     }
+    localStorage.setItem('_data', JSON.stringify(_response));
     if (_options.cb !== null) {
       _options.cb(_response);
     }
@@ -92,6 +93,8 @@ DrivePass.GoogleSpreadsheet = (function(){
     } else {
       _response = {success:true, message: 'saved successfully'};
     }
+    // running Load again to refresh localStorage copy with new info
+    load();
     if (_options.cb !== null) {
       _options.cb(_response);
     }
