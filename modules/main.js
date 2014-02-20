@@ -4,7 +4,7 @@ DrivePass.ext = new DrivePass.Router({
 
   universal : function(){
     DrivePass.Settings = JSON.parse(localStorage.getItem('options')) || {};
-    DrivePass.Settings.page = document.body.dataset.route;
+    DrivePass.Settings.route = document.body.dataset.route;
   },
 
   popup : function() {
