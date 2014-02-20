@@ -1,0 +1,20 @@
+{
+  "boss": true,
+  "browser": true,
+  "curly": true,
+  "eqeqeq": true,
+  "eqnull": true,
+  "immed": false,
+  "latedef": true,
+  "newcap": true,
+  "noarg": true,
+  "node": true,
+  "sub": true,
+  "undef": true,
+  "globals": {
+    "DrivePass" : true,
+    "chrome" : true,
+    "utils" : true,
+    "Ply" : true
+  }
+}

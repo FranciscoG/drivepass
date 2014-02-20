@@ -41,14 +41,14 @@ DrivePass.ext = new DrivePass.Router({
    
     // Saves options to localStorage.
     function save_options() {
-      localStorage["sheet_url"] = document.getElementById("sheet_url").value;
+      localStorage.setItem("sheet_url", document.getElementById("sheet_url").value);
       // Update status to let user know options were saved.
       document.getElementById("status").textContent = "Options Saved.";
     }
 
     // Populates the input box with the saved url if it exists
     function restore_options() {
-      var curr_url = localStorage["sheet_url"];
+      var curr_url = localStorage.getItem("sheet_url");
       if (!curr_url || curr_url === "") {
         return false;
       } else {

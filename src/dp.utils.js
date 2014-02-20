@@ -36,7 +36,7 @@ var utils = {
         a = document.createElement('a');
     if (_url !== ""){
       a.href = _url;
-      return a['hostname'];
+      return a.hostname;
     } else {
       console.warn('url undefined');
       return false;

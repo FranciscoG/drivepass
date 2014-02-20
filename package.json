@@ -1,14 +1,26 @@
 {
   "name": "DrivePass",
   "version": "0.0.0-ignored",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/FranciscoG/password-manager-extension.git"
+  },
   "Gruntfile": "Gruntfile.js",
   "devDependencies": {
-    "grunt":      "~0.4.1",
+    "grunt": "~0.4.1",
     "grunt-contrib-jshint": "*",
     "grunt-contrib-concat": "*",
     "grunt-contrib-uglify": "*",
-    "grunt-contrib-watch":  "*",
-    "grunt-contrib-copy":   "*",
-    "matchdep":             "*"
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-copy": "*",
+    "matchdep": "*",
+    "gulp-util": "~2.2.14",
+    "gulp": "~3.5.2",
+    "gulp-uglify": "~0.2.1",
+    "gulp-concat": "~2.1.7",
+    "gulp-jshint": "~1.4.2",
+    "gulp-changed": "~0.2.0",
+    "jshint-stylish": "~0.1.5",
+    "streamqueue": "0.0.4"
   }
 }

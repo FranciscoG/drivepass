@@ -16,7 +16,7 @@ DrivePass.Popup = (function() {
   var Sheet = new DrivePass.GoogleSpreadsheet();
 
   Sheet.init({
-    sheet_url : localStorage['sheet_url'],
+    sheet_url : localStorage.getItem('sheet_url'),
     columns : ['site','username','password']
   });
 
