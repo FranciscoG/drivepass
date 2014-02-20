@@ -23,10 +23,10 @@ function moveStuff(cfg) {
     .pipe(changed(cfg.src))
     .pipe(gulp.dest(cfg.dest));
 }
-function exportTo(dest){
-  moveStuff({src: "src/css/*", dest: dest+"/css"});
-  moveStuff({src: "src/build/*", dest: dest+"/js"});
-  return moveStuff({src: "src/img/*", dest: dest+"/img"});
+function exportTo(_dest){
+  moveStuff({src: "src/css/*", dest: _dest+"/css"});
+  moveStuff({src: "src/build/*", dest: _dest+"/js"});
+  return moveStuff({src: "src/img/*", dest: _dest+"/img"});
 }
 
 gulp.task('lint', function() {
