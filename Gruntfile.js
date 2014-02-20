@@ -1,13 +1,5 @@
-var libs = [
-  'modules/libs/ply.core.js'
-];
-
 var myscripts = [
-  'modules/utils.js',
-  'modules/browsersupport.js',
-  'modules/googlespreadsheet.js',
-  'modules/password-generator.js',
-  'modules/popup.js',
+  'modules/dp.*.js',
   'modules/main.js'
 ];
 
@@ -39,7 +31,7 @@ module.exports = function(grunt){
     
     watch: {
       js: {
-        files: [libs, myscripts], tasks: ['jshint','concat','uglify','copy']
+        files: [myscripts], tasks: ['jshint','concat','uglify','copy']
       }
     },
 
@@ -74,14 +66,14 @@ module.exports = function(grunt){
 
     concat: {
       build: {
-        files: { 'modules/drivepass.js': [libs, myscripts] }
+        files: { 'modules/build/drivepass.js': ['modules/libs/*.js', myscripts] }
       }
     },
 
     uglify: {
       build: {
         files: {
-          'modules/drivepass.min.js': ['modules/drivepass.js']
+          'modules/build/drivepass.min.js': ['modules/build/drivepass.js']
         },
         options: {
           beautify: false,

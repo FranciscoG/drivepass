@@ -199,58 +199,84 @@ Ply.core = (function () {
 })();
 
 // &#8618; [Ajax](ajax.html)
-var utils = {
-  /**
-   * Add or remove the css class "show" from a DOM element
-   * @param {object}  elm  - A DOM element 
-   */
-  toggle: function(elm) {
-    if (elm.classList.contains("show")) {
-      elm.classList.remove('show');
-    } else {
-      elm.classList.add('show');
-    }
+/* 
+ * This is the funnel for all browser related interactions
+ * right now it only handles Chrome, in the futre it will also handle FireFox
+*/
+
+var DrivePass = DrivePass || {};
+
+DrivePass.Browser = {
+
+  isChrome : function(){
+    return /Chrome/.test(navigator.userAgent);
   },
   
-  /**
-   * simple toggler to add/remove a class that uses CSS3 transition to show/hide an element
-   * @param  {string}   handler 
-   * @param  {string}   targ
-   */
-  toggler: function(handler,targ) {
-    var self = this;
-    var elm = document.getElementById(targ);
-    document.getElementById(handler).addEventListener('click',function(e){
-      self.toggle(elm);
-    },false);
+  isFirefox : function(){
+    return /Firefox/.test(navigator.userAgent);
   },
 
-  /**
-    * gets the hostname from a URL string
-    * @param  {string}  a full url
-    * @return {string}
-    */
-  getHostname: function(url){
-    // letting the browser give me the hostname, easier than a regex
-    // inspired by: http://stackoverflow.com/a/12470263
-    var _url = url || "",
-        a = document.createElement('a');
-    if (_url !== ""){
-      a.href = _url;
-      return a['hostname'];
-    } else {
-      console.warn('url undefined');
+  sendToPage : function(data) {
+    var _data = data || {};
+
+    // data should always have username and password, otherwise return.
+    if ( Object.keys(_data).length !== 2) {
       return false;
+    }
+
+    if (this.isChrome()) {
+
+      chrome.tabs.getSelected(null, function(tab) {
+        chrome.tabs.sendMessage(tab.id, {
+          password: _data.password,
+          username: _data.username
+        }, function(response) {
+            console.log(response.dom);
+        });
+      });
+
+    }
+
+  },
+
+  getActiveTab : function(callback) {
+
+    if (this.isChrome()) {
+
+      chrome.tabs.query({
+        active: true,
+        lastFocusedWindow: true
+      }, function(tabs) {
+        var tab = tabs[0];
+        this.activeTabUrl = utils.getHostname(tab.url);
+        
+        if (typeof callback === 'function') {
+          callback();
+        }
+
+      }.bind(this));
+    }
+  
+  },
+
+  oAuthSendRequest : function(listUrl, callback, params) {
+
+    if (this.isChrome()) {
+
+      var bgPage = chrome.extension.getBackgroundPage();
+      bgPage.oauth.sendSignedRequest(listUrl, callback, params);
+
     }
   }
 
 };
+
+
 var DrivePass = DrivePass || {};
 
 DrivePass.GoogleSpreadsheet = (function(){
 
-  var bgPage = chrome.extension.getBackgroundPage(),
-      _options = {},
+  var _options = {},
       _response;
 
   var filterResults = function(response){
@@ -296,7 +322,7 @@ DrivePass.GoogleSpreadsheet = (function(){
         'showfolders': 'true'
       }
     };
-    bgPage.oauth.sendSignedRequest(_options.jsonListUrl, processLoad, params);
+    DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl, processLoad, params);
   };
 
   /**
@@ -314,7 +340,7 @@ DrivePass.GoogleSpreadsheet = (function(){
       },
       'body': constructSpreadAtomXml_(data)
     };
-    bgPage.oauth.sendSignedRequest(_options.jsonListUrl, processAdd, params);
+    DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl, processAdd, params);
   };
 
   /**
@@ -466,20 +492,6 @@ DrivePass.Popup = (function() {
   var Sheet = new DrivePass.GoogleSpreadsheet();
 
  /**
-  * Sends info to contentscript.js 
-  * contentscripts is how a Chrome extensions interacts with a website
-  * @param  {string}   un  - a usersname/login
-  * @param  {string}   pw  - a password
-  */
-  var sendDetails = function(un,pw){
-    chrome.tabs.getSelected(null, function(tab) {
-      chrome.tabs.sendMessage(tab.id, {password: pw,username: un}, function(response) {
-        console.log(response.dom);
-      });
-    });
-  };
-
- /**
   * Searches through the spreadsheet data for the matching domain
   * @param  {object}  data - json object
   * @param  {string}  tabDomain
@@ -524,7 +536,9 @@ DrivePass.Popup = (function() {
     handleStatus('success','password found');
     $un.textContent = result[0];
     $pw.textContent = result[1];
-    sendDetails(result[0],result[1]);
+    
+    DrivePass.Browser.sendToPage({username: result[0], password: result[1]});
+    
     $add.textContent = "update";
   };
 
@@ -555,32 +569,27 @@ DrivePass.Popup = (function() {
     },false);
   };
 
-  var init = function() {
-    // chrome.tabs.query allows us to interact with current open tabs
-    // I'm using it to grab the url of the active tab
-    // it's asynchronous and can be passed a callback function
-    chrome.tabs.query({
-      active: true,
-      lastFocusedWindow: true
-    }, function(tabs) {
-      var tab = tabs[0];
-      activeUrl = utils.getHostname(tab.url);
-      
-      Sheet.init({
-        sheet_url : localStorage['sheet_url'],
-        columns : ['site','username','password']
-      });
-
-      Sheet.load(function(result){
-        var found = findPW(result.sheetData,activeUrl);
-        if (typeof found === 'undefined') {
-          pwNotFound();
-        } else {
-          onSuccess(found);
-        }
-      });
-
+  var initCb = function(){
+    
+    Sheet.init({
+      sheet_url : localStorage['sheet_url'],
+      columns : ['site','username','password']
     });
+
+    Sheet.load(function(result){
+      activeUrl = DrivePass.Browser.activeTabUrl;
+      var found = findPW(result.sheetData,activeUrl);
+      if (typeof found === 'undefined') {
+        pwNotFound();
+      } else {
+        onSuccess(found);
+      }
+    });
+    
+  };
+
+  var init = function() {
+    DrivePass.Browser.getActiveTab(initCb);
     bindAdd();
   };
 
@@ -588,25 +597,109 @@ DrivePass.Popup = (function() {
     init: init
   };
 });
-(function(){
+/*  
+* Super simple JS router, like super super simple
+*
+* Because Chrome Extensions don't allow you to run 'external' scripts (which include inline scripts)
+* I'm placing the route for the document as a data attribute of the body tag
+* <body data-route="popup">
+* it then looks for the function that matches that route and runs it
+*/
 
-  var initUI = function(){
-    utils.toggler('showGPoptions','gpOptions');
-    utils.toggler('showInfo','theInfo');
-    utils.toggler('show_symbols','hidden_symbols');
+var DrivePass = DrivePass || {};
+
+DrivePass.Router = (function() {
+  function Router(info) {
+    this.methods = info;
+    this.process();
+  }
+
+  Router.prototype.process = function() {
+    var route = document.body.dataset.route;
+    // always run what's in 'universal' before other routes
+    this.methods.universal(); 
+    var theRoute = this.methods[route];
+    if (typeof theRoute === 'function') { 
+      theRoute(); 
+    }
   };
 
-  var popup = new DrivePass.Popup();
-  var generate = new DrivePass.Generator();
-  
-  document.addEventListener('DOMContentLoaded', function(e) {
-    if (this.bDone) {
-      return; // deal with DOMContentLoaded being fired twice for some reason
-    }
-    this.bDone = true;
-    generate.init();
-    popup.init();
-    initUI();
-  });
+  return Router;
 
 })();
+var utils = {
+  /**
+   * Add or remove the css class "show" from a DOM element
+   * @param {object}  elm  - A DOM element 
+   */
+  toggle: function(elm) {
+    if (elm.classList.contains("show")) {
+      elm.classList.remove('show');
+    } else {
+      elm.classList.add('show');
+    }
+  },
+  
+  /**
+   * simple toggler to add/remove a class that uses CSS3 transition to show/hide an element
+   * @param  {string}   handler 
+   * @param  {string}   targ
+   */
+  toggler: function(handler,targ) {
+    var self = this;
+    var elm = document.getElementById(targ);
+    document.getElementById(handler).addEventListener('click',function(e){
+      self.toggle(elm);
+    },false);
+  },
+
+  /**
+    * gets the hostname from a URL string
+    * @param  {string}  a full url
+    * @return {string}
+    */
+  getHostname: function(url){
+    // letting the browser give me the hostname, easier than a regex
+    // inspired by: http://stackoverflow.com/a/12470263
+    var _url = url || "",
+        a = document.createElement('a');
+    if (_url !== ""){
+      a.href = _url;
+      return a['hostname'];
+    } else {
+      console.warn('url undefined');
+      return false;
+    }
+  }
+
+};
+var DrivePass = DrivePass || {};
+
+DrivePass.app = new DrivePass.Router({
+
+  universal : function(){
+    // nothing to see here, move along
+  },
+
+  popup : function() {
+    var initUI = function(){
+      utils.toggler('showGPoptions','gpOptions');
+      utils.toggler('showInfo','theInfo');
+      utils.toggler('show_symbols','hidden_symbols');
+    };
+
+    var popup = new DrivePass.Popup();
+    var generate = new DrivePass.Generator();
+    
+    document.addEventListener('DOMContentLoaded', function(e) {
+      if (this.bDone) {
+        return; // deal with DOMContentLoaded being fired twice for some reason
+      }
+      this.bDone = true;
+      generate.init();
+      popup.init();
+      initUI();
+    });
+  }
+
+});
