@@ -10,16 +10,34 @@ var gulp = require('gulp'),
 var libs = "src/libs/*.js";
 var modules = "src/dp.*.js";
 var main = "src/main.js";
-var build = "src/build/*.js"; // only used to copy it
+
+/************************************************************/
+// Global setting to state which browser you are building for
+
+var buildFor = "Chrome";
+
+/************************************************************/
+
+function moveStuff(cfg) {
+  return gulp.src(cfg.src)
+    .pipe(changed(cfg.src))
+    .pipe(gulp.dest(cfg.dest));
+}
+function exportTo(dest){
+  moveStuff({src: "src/css/*", dest: dest+"/css"});
+  moveStuff({src: "src/build/*", dest: dest+"/js"});
+  return moveStuff({src: "src/img/*", dest: dest+"/img"});
+}
 
 gulp.task('lint', function() {
   gulp.src('src/*.js')
     .pipe(changed('src', { extension: '.js' }))
     .pipe(jshint('.jshintrc'))
-    .pipe(jshint.reporter(stylish));
+    .pipe(jshint.reporter(stylish))
+    .pipe(jshint.reporter('fail'));
 });
 
-gulp.task('concat',function(){
+gulp.task('concat',['lint'], function(){
   return streamqueue({ objectMode: true },
         gulp.src(libs),
         gulp.src(modules),
@@ -29,20 +47,16 @@ gulp.task('concat',function(){
       .pipe(gulp.dest('src/build'));
 });
 
-gulp.task('uglify', function(){
+gulp.task('uglify', ['concat'], function(){
   gulp.src('src/build/drivepass.js')
     .pipe(uglify({outSourceMap: true}))
     .pipe(gulp.dest('src/build'))
 });
 
-gulp.task('chrome', function() {
-  // move images to Chrome folder
-  // move css to Chrome folder
-  // move build to Chrome folder
+gulp.task('export', ['uglify'], function() {
+  exportTo(buildFor);
 });
 
-// gulp watch
-// run default but only changed files
-
-// gulp.watch chrome
-// only move over changed files
+gulp.task('default', ['export'], function(){
+  gulp.watch('src/*.js', ['export']);
+});

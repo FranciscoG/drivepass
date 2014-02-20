@@ -201,7 +201,7 @@ Ply.core = (function () {
 // &#8618; [Ajax](ajax.html)
 /* 
  * This is the funnel for all browser related interactions
- * right now it only handles Chrome, in the futre it will also handle FireFox
+ * right now it only handles Chrome, in the futre it will also handle FireFox, maybe Safari too
 */
 
 var DrivePass = DrivePass || {};
@@ -500,7 +500,7 @@ DrivePass.Popup = (function() {
   var Sheet = new DrivePass.GoogleSpreadsheet();
 
   Sheet.init({
-    sheet_url : localStorage['sheet_url'],
+    sheet_url : localStorage.getItem('sheet_url'),
     columns : ['site','username','password']
   });
 
@@ -682,7 +682,7 @@ var utils = {
         a = document.createElement('a');
     if (_url !== ""){
       a.href = _url;
-      return a['hostname'];
+      return a.hostname;
     } else {
       console.warn('url undefined');
       return false;
@@ -696,7 +696,7 @@ DrivePass.ext = new DrivePass.Router({
 
   universal : function(){
     DrivePass.Settings = JSON.parse(localStorage.getItem('options')) || {};
-    DrivePass.Settings.page = document.body.dataset.route;
+    DrivePass.Settings.route = document.body.dataset.route;
   },
 
   popup : function() {
@@ -733,14 +733,14 @@ DrivePass.ext = new DrivePass.Router({
    
     // Saves options to localStorage.
     function save_options() {
-      localStorage["sheet_url"] = document.getElementById("sheet_url").value;
+      localStorage.setItem("sheet_url", document.getElementById("sheet_url").value);
       // Update status to let user know options were saved.
       document.getElementById("status").textContent = "Options Saved.";
     }
 
     // Populates the input box with the saved url if it exists
     function restore_options() {
-      var curr_url = localStorage["sheet_url"];
+      var curr_url = localStorage.getItem("sheet_url");
       if (!curr_url || curr_url === "") {
         return false;
       } else {
