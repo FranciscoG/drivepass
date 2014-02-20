@@ -305,7 +305,9 @@ DrivePass.GoogleSpreadsheet = (function(){
       _response = {success:true, message: 'spreadsheet successfully loaded'};
       _response.sheetData = filterResults(response);
     }
+    // TODO: check options if should be saving to local storage
     localStorage.setItem('_data', JSON.stringify(_response));
+    // TODO: maybe use pubsub instead of callback
     if (_options.cb !== null) {
       _options.cb(_response);
     }
@@ -368,7 +370,9 @@ DrivePass.GoogleSpreadsheet = (function(){
       _response = {success:true, message: 'saved successfully'};
     }
     // running Load again to refresh localStorage copy with new info
+    // TODO: but only if option to store locally is true
     load();
+    // TODO: maybe use pubsub instead of callback
     if (_options.cb !== null) {
       _options.cb(_response);
     }
@@ -584,7 +588,9 @@ DrivePass.Popup = (function() {
   };
 
   var initCb = function(){
-
+    /*
+    TODO: check local storage option and either run below or do sheet.load with callback
+    */
     activeUrl = DrivePass.Browser.activeTabUrl;
     var found = findPW(theData.sheetData,activeUrl);
     if (typeof found === 'undefined') {
@@ -686,10 +692,10 @@ var utils = {
 };
 var DrivePass = DrivePass || {};
 
-DrivePass.app = new DrivePass.Router({
+DrivePass.ext = new DrivePass.Router({
 
   universal : function(){
-    DrivePass.Settings = DrivePass.Settings || {};
+    DrivePass.Settings = JSON.parse(localStorage.getItem('options')) || {};
     DrivePass.Settings.page = document.body.dataset.route;
   },
 
@@ -715,6 +721,16 @@ DrivePass.app = new DrivePass.Router({
   },
 
   chrome_options : function() {
+    /*
+    TODO:  
+    - add option whether to store db locally or not, read that option in googlespreadsheet module
+    - store new option pref in localStorage
+    - add ability to clear out local cache
+    - when turning off option (setting it to false), clear out localStorage sheet data
+    - if sheet_url not set, add/show a link to "drive.google.com"
+    - UI updates all around
+    */
+   
     // Saves options to localStorage.
     function save_options() {
       localStorage["sheet_url"] = document.getElementById("sheet_url").value;
