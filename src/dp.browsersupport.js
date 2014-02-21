@@ -62,7 +62,7 @@ DrivePass.Browser = {
 
     if (this.isChrome()) {
 
-      var bgPage = chrome.extension.getBackgroundPage();
+      var bgPage = chrome.runtime.getBackgroundPage();
       bgPage.oauth.sendSignedRequest(listUrl, callback, params);
 
     }
