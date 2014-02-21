@@ -8,14 +8,12 @@ var gulp = require('gulp'),
     streamqueue = require('streamqueue');
 
 var libs = "src/libs/*.js";
-var modules = "src/dp.*.js";
+var modules = "src/modules/*.js";
 var main = "src/main.js";
 
 /************************************************************/
 // Global setting to state which browser you are building for
-
 var buildFor = "Chrome";
-
 /************************************************************/
 
 function moveStuff(cfg) {

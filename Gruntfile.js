@@ -10,10 +10,6 @@ module.exports = function(grunt){
 
   grunt.initConfig({
 
-    config: {
-      timestamp: parseInt(new Date().getTime() / 1000, 10)
-    },
-
     pkg: grunt.file.readJSON('package.json'),
     
     copy: {
@@ -66,14 +62,14 @@ module.exports = function(grunt){
 
     concat: {
       build: {
-        files: { 'modules/build/drivepass.js': ['modules/libs/*.js', myscripts] }
+        files: { 'src/build/drivepass.js': ['src/libs/*.js', myscripts] }
       }
     },
 
     uglify: {
       build: {
         files: {
-          'modules/build/drivepass.min.js': ['modules/build/drivepass.js']
+          'src/build/drivepass.min.js': ['src/build/drivepass.js']
         },
         options: {
           beautify: false,
