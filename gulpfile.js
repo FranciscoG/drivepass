@@ -57,6 +57,11 @@ gulp.task('export', ['uglify'], function() {
   exportTo(buildFor);
 });
 
-gulp.task('default', ['export'], function(){
+gulp.task('watch', ['export'], function(){
   gulp.watch('src/*.js', ['export']);
+  gulp.watch('src/css/*.css', ['export']);
+  gulp.watch('src/img/**', ['export']);
 });
+
+gulp.task('default', ['export']);
+

@@ -305,7 +305,6 @@ DrivePass.GoogleSpreadsheet = (function(){
       _response = {success:true, message: 'spreadsheet successfully loaded'};
       _response.sheetData = filterResults(response);
     }
-    // TODO: check options if should be saving to local storage
     localStorage.setItem('_data', JSON.stringify(_response));
     // TODO: maybe use pubsub instead of callback
     if (_options.cb !== null) {
@@ -370,7 +369,6 @@ DrivePass.GoogleSpreadsheet = (function(){
       _response = {success:true, message: 'saved successfully'};
     }
     // running Load again to refresh localStorage copy with new info
-    // TODO: but only if option to store locally is true
     load();
     // TODO: maybe use pubsub instead of callback
     if (_options.cb !== null) {
