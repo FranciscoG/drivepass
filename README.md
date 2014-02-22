@@ -9,15 +9,16 @@ DrivePass
 
 Browser extension that accesses a user's private google spreadsheet to store and access website logins and passwords.
 
-<div style="padding:20px; background:#cecece; border:1px solid tomato;">
 <h2 style="color:red;font-weight:bold;line-height:1; border:none; margin-top:5px;" align="center">!! WARNING !!</h2>
-<p>
-If you are going to store your passwords in a google spreadsheet please activate Google's 2-step verification (you should be doing that already anyways!)</p>
+
+If you are going to store your passwords in a google spreadsheet please activate Google's 2-step verification (you should be doing that already anyways!)
 
 <a href="http://www.google.com/landing/2step/">http://www.google.com/landing/2step/</a>
-</div>
+
 
 Uses oAuth 2.0 to grant access to your Google Speadsheets
+
+#### Dev Setup
 
 Install [Gulp](http://gulpjs.com/) globally and its dependencies:    
 ```javascript
