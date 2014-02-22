@@ -28,7 +28,10 @@ function exportTo(_dest){
 }
 
 gulp.task('lint', function() {
-  gulp.src('src/*.js')
+  return streamqueue({ objectMode: true },
+        gulp.src(modules),
+        gulp.src(main)
+    )
     .pipe(changed('src', { extension: '.js' }))
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter(stylish))
