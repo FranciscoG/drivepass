@@ -37,7 +37,7 @@ DrivePass.ext = new DrivePass.Router({
       columns : ['site','username','password']
     });
    
-    // Saves options to localStorage.
+    // Saves options to localStorage.cc
     function save_options() {
       localStorage.setItem("sheet_url", document.getElementById("sheet_url").value);
       // load data into locatStorage upon saving

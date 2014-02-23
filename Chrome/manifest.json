@@ -7,32 +7,37 @@
     "48": "img/drive-pass48.png",
     "128": "img/drive-pass128.png"
   },
-
   "version": "1.1",
-
+  "minimum_chrome_version": "22.0",
   "browser_action": {
     "default_icon": "img/drive-pass19.png",
     "default_popup": "popup.html"
   },
   "background": {
-    "page": "background.html",
-    "persistent": false
+    "page": "background.html"
   },
   "options_page": "options.html",
   "permissions": [
     "activeTab",
-    "https://*.google.com/*",
-    "https://docs.google.com/feeds/*",
-    "http://spreadsheets.google.com/feeds/*",
-    "https://spreadsheets.google.com/feeds/*",
-    "https://www.google.com/accounts/OAuthGetRequestToken",
-    "https://www.google.com/accounts/OAuthAuthorizeToken",
-    "https://www.google.com/accounts/OAuthGetAccessToken"
+    "tabs",
+    "idle",
+    "notifications",
+    "webRequest",
+    "webRequestBlocking",
+    "http://*/*",
+    "https://*/*"
   ],
+  "requirements": {
+      "plugins": {
+         "npapi": false
+      }
+   },
   "content_scripts": [
     {
+      "all_frames": true,
+      "js": ["js/contentscript.js"],
       "matches": ["*://*/*"],
-      "js": ["js/contentscript.js"]
+      "run_at": "document_start"
     }
   ],
   "content_security_policy": "script-src 'self' https://spreadsheets.google.com; object-src 'self'",

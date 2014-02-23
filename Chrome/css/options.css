@@ -26,3 +26,26 @@
   display: none;
   margin-top: 10px;
 }
+
+#inst_link {
+  color:grey;
+}
+#inst_link:hover {
+  cursor: pointer;
+  color:black;
+}
+
+#instructions {
+  display: none;
+  padding:10px;
+  margin:5px;
+  border:1px solid #bfbfbf;
+  background: #cdcdcd;
+}
+#instructions h3 {
+  margin-top: 0;
+}
+
+ol li {
+  margin: 10px 0;
+}
