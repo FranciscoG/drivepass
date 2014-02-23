@@ -1,1 +1,618 @@
-window.Ply={VERSION:"0.4.2"},Ply.core=function(){"use strict";var e={},t=0,n=!1;return{notify:function(t,n,s){for(var o=e[t]||(e[t]=[]),r=0,a=o.length;a>r;r++)o[r].handler.call(o[r].listener,t,n,s)},listen:function(n,s,o){var r=e[n]||(e[n]=[]),a=n.split(/\s/),i=a.length,u=0;{if(!(i>1))return r.push({id:t+=1,handler:s,listener:o}),[n,t];for(;i>u;u++)this.listen(a[u],s,o)}},ignore:function(t){var n=t[0];e[n]&&e[n].forEach(function(s){this.id===t[1]&&e[n].splice(s,1)})},log:function(e,t){if(n&&window.console)switch(t){case"warn":window.console.warn(e);break;case"info":window.console.info(e);break;default:window.console.log(e)}},error:function(e,t){if(Ply.config.core.onError&&"function"==typeof Ply.config.core.onError)return void Ply.config.core.onError(e,t);throw e},debug:function(e){n="undefined"==typeof e?!0:e,n?(this.log("debugging...","info"),this.debugOn=!0):this.debugOn=!1},debugOn:function(){return!!n}()}}();var DrivePass=DrivePass||{};DrivePass.Browser={isChrome:function(){return/Chrome/.test(navigator.userAgent)},isFirefox:function(){return/Firefox/.test(navigator.userAgent)},sendToPage:function(e){var t=e||{};return 2!==Object.keys(t).length?!1:void(this.isChrome()&&chrome.tabs.getSelected(null,function(e){chrome.tabs.sendMessage(e.id,{password:t.password,username:t.username},function(e){console.log(e.dom)})}))},getActiveTab:function(e){this.isChrome()&&chrome.tabs.query({active:!0,lastFocusedWindow:!0},function(t){var n=t[0];this.activeTabUrl=utils.getHostname(n.url),"function"==typeof e&&e()}.bind(this))},oAuthSendRequest:function(e,t,n){if(this.isChrome()){var s=chrome.runtime.getBackgroundPage();s.oauth.sendSignedRequest(e,t,n)}}};var DrivePass=DrivePass||{};DrivePass.GoogleSpreadsheet=function(){var e,t={},n=function(e){var n=JSON.parse(e),s=0,o={},r=n.feed.entry,a=t.columns;for(var i in r){o[s]={};for(var u=0;u<a.length;u++){var c="gsx$"+a[u];o[s][a[u]]=r[i][c].$t}s++}return o},s=function(s,o){return 200!==o.status?(e={success:!1,message:o.status+": Connection Failed"},console.warn(o)):(e={success:!0,message:"spreadsheet successfully loaded"},e.sheetData=n(s)),localStorage.setItem("_data",JSON.stringify(e)),null!==t.cb&&t.cb(e),e},o=function(e){t.cb="function"==typeof e?e:null;var n={headers:{"GData-Version":"3.0"},parameters:{alt:"json",showfolders:"true"}};DrivePass.Browser.oAuthSendRequest(t.jsonListUrl,s,n)},r=function(e,n){t.cb="function"==typeof n?n:null;var s={method:"POST",headers:{"GData-Version":"3.0","Content-Type":"application/atom+xml"},body:a(e)};DrivePass.Browser.oAuthSendRequest(t.jsonListUrl,i,s)},a=function(e){for(var n='<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">\n',s=t.columns,o=0;o<s.length;o++)n+="<gsx:"+s[o]+">"+e[o]+"</gsx:"+s[o]+">\n";return n+="</entry>"},i=function(n,s){return 201!==s.status?(e={success:!1,message:s.status+": error saving"},console.warn(s)):e={success:!0,message:"saved successfully"},o(),null!==t.cb&&t.cb(e),e},u=function(e){if(t=e||{},"string"!=typeof t.sheet_url||"object"!=typeof t.columns)throw new Error("Missing sheet_url or columns from init options");var n,s,o=t.sheet_url;if(o.match(/http(s)*:/)){n=o;try{s=n.match(/key=(.*?)(&|#)/)[1]}catch(r){s=n.match(/(cells|list)\/(.*?)\//)[2]}}else s=o;return t.jsonListUrl="https://spreadsheets.google.com/feeds/list/"+s+"/od6/private/full",t.jsonCellsUrl="https://spreadsheets.google.com/feeds/cells/"+s+"/od6/private/basic",this};return{init:u,load:o,add:r}};var DrivePass=DrivePass||{};DrivePass.Generator=function(){var e=document.getElementById("uppercase"),t=document.getElementById("lowercase"),n=document.getElementById("numbers"),s=document.getElementById("show_symbols"),o=document.getElementById("symbols"),r=document.getElementById("pw"),a=function(){var r="",a=0,i="",u=document.getElementById("digits").value||15;if(2>u&&(u=7),[e,t,n].forEach(function(e){if(e.checked===!0){i+=e.value;var t=e.value.length;r+=e.value.charAt(Math.floor(Math.random()*t)),a++}}),s.checked===!0){i+=o.value;var c=o.value.length;r+=o.value.charAt(Math.floor(Math.random()*c)),a++}return[u,i,r,a]},i=function(e){e.preventDefault();for(var t=a(),n=t[0]-t[3],s=t[1],o="",i=0,u=s.length;n>i;++i)o+=s.charAt(Math.floor(Math.random()*u));return o+=t[2],r.textContent=o,r.className="generated",!0},u=function(){document.getElementById("makePassword").addEventListener("click",i,!1)};return{init:u}};var DrivePass=DrivePass||{};DrivePass.Popup=function(){var e,t=document.getElementById("loading"),n=document.getElementById("status"),s=document.getElementById("un"),o=document.getElementById("pw"),r=document.getElementById("add"),a=document.getElementById("theInfo"),i=JSON.parse(localStorage.getItem("_data")),u=new DrivePass.GoogleSpreadsheet;u.init({sheet_url:localStorage.getItem("sheet_url"),columns:["site","username","password"]}),null===i&&(u.load(),i=JSON.parse(localStorage.getItem("_data")));var c=function(e,t){var n=e||{};if(Object.keys(n).length){for(var s in n)if(-1!==t.indexOf(n[s].site)){var o=[];return o.push(n[s].username,n[s].password),o}}else console.warn("findPW: data not an object")},l=function(e,t){var s=e||"",o=t||"";""!==s&&""!==o&&(n.textContent=o,n.className=s,n.style.display="block")},d=function(e){t.style.display="none",l("success","password found"),s.textContent=e[0],o.textContent=e[1],DrivePass.Browser.sendToPage({username:e[0],password:e[1]}),r.textContent="update"},f=function(){t.style.display="none",l("error","password not found"),utils.toggle(a)},m=function(){r.addEventListener("click",function(){var t=document.getElementById("un").textContent,n=document.getElementById("pw").textContent,s=[e,t,n];u.add(s,function(e){e.success===!1?l("error",e.message):l("success",e.message)})},!1)},g=function(){e=DrivePass.Browser.activeTabUrl;var t=c(i.sheetData,e);"undefined"==typeof t?f():d(t)},h=function(){DrivePass.Browser.getActiveTab(g),m()};return{init:h}};var DrivePass=DrivePass||{};DrivePass.Router=function(){function e(e){this.methods=e,this.process()}return e.prototype.process=function(){this.methods.universal();var e=document.body.dataset.route;if("undefined"!=typeof e){var t=this.methods[e];"function"==typeof t&&t()}},e}();var utils={toggle:function(e){e.classList.contains("show")?e.classList.remove("show"):e.classList.add("show")},toggler:function(e,t){var n=this,s=document.getElementById(t);document.getElementById(e).addEventListener("click",function(){n.toggle(s)},!1)},getHostname:function(e){var t=e||"",n=document.createElement("a");return""!==t?(n.href=t,n.hostname):(console.warn("url undefined"),!1)}},DrivePass=DrivePass||{};DrivePass.ext=new DrivePass.Router({universal:function(){DrivePass.Settings=JSON.parse(localStorage.getItem("options"))||{},DrivePass.Settings.route=document.body.dataset.route},popup:function(){var e=function(){utils.toggler("showGPoptions","gpOptions"),utils.toggler("showInfo","theInfo"),utils.toggler("show_symbols","hidden_symbols")},t=new DrivePass.Popup,n=new DrivePass.Generator;document.addEventListener("DOMContentLoaded",function(){this.bDone||(this.bDone=!0,n.init(),t.init(),e())})},chrome_options:function(){function e(){localStorage.setItem("sheet_url",document.getElementById("sheet_url").value),document.getElementById("status").textContent="Options Saved."}function t(){var e=localStorage.getItem("sheet_url");if(!e||""===e)return!1;document.getElementById("sheet_url").value=e,document.getElementById("save").textContent="update";var t=document.getElementById("goToSheet");t.href=e,t.style.display="block"}document.addEventListener("DOMContentLoaded",t),document.getElementById("save").addEventListener("click",e)}});
+/* 
+ * This is the funnel for all browser related interactions
+ * right now it only handles Chrome, in the futre it will also handle FireFox, maybe Safari too
+*/
+
+var DrivePass = DrivePass || {};
+
+DrivePass.Browser = {
+
+  isChrome : function(){
+    return /Chrome/.test(navigator.userAgent);
+  },
+  
+  isFirefox : function(){
+    return /Firefox/.test(navigator.userAgent);
+  },
+
+  sendToPage : function(data) {
+    var _data = data || {};
+
+    // data should always have username and password, otherwise return.
+    if ( Object.keys(_data).length !== 2) {
+      return false;
+    }
+
+    if (this.isChrome()) {
+
+      chrome.tabs.getSelected(null, function(tab) {
+        chrome.tabs.sendMessage(tab.id, {
+          password: _data.password,
+          username: _data.username
+        }, function(response) {
+            console.log(response.dom);
+        });
+      });
+
+    }
+
+  },
+
+  getActiveTab : function(callback) {
+
+    if (this.isChrome()) {
+
+      chrome.tabs.query({
+        active: true,
+        lastFocusedWindow: true
+      }, function(tabs) {
+        var tab = tabs[0];
+        this.activeTabUrl = utils.getHostname(tab.url);
+        
+        if (typeof callback === 'function') {
+          callback();
+        }
+
+      }.bind(this));
+    }
+  
+  },
+
+  oAuthSendRequest : function(listUrl, callback, params) {
+
+    if (this.isChrome()) {
+
+      var bgPage = chrome.extension.getBackgroundPage();
+      bgPage.oauth.sendSignedRequest(listUrl, callback, params);
+
+    }
+  }
+
+};
+
+
+var DrivePass = DrivePass || {};
+
+DrivePass.GoogleSpreadsheet = (function(){
+
+  var _options = {},
+      _response;
+
+  var filterResults = function(response){
+    var data = JSON.parse(response);
+    var _i = 0,
+        _results = {},
+        _entries = data.feed.entry,
+        cols = _options.columns;
+
+    for (var prop in _entries) {
+      _results[_i] = {};
+      for (var n=0; n < cols.length; n++){
+        var gsx = 'gsx$'+cols[n];
+        _results[_i][cols[n]] = _entries[prop][gsx].$t;
+      }
+      _i++;
+    }
+    return _results;
+  };
+
+  var processLoad = function(response,xhr){
+    if (xhr.status !== 200) {
+      _response = {success:false, message: xhr.status + ": Connection Failed"};
+      console.warn(xhr);
+    } else {
+      _response = {success:true, message: 'spreadsheet successfully loaded'};
+      _response.sheetData = filterResults(response);
+    }
+    DrivePass.Signal.broadcast('gs_data_loaded', _response);
+
+    if (_options.cb !== null) {
+      _options.cb(_response);
+    }
+    return _response;
+  };
+
+  var load = function(cb) {
+    _options.cb = (typeof cb === "function") ? cb : null;
+    var params = {
+      'headers': {
+        'GData-Version': '3.0'
+      },
+      'parameters': {
+        'alt': 'json',
+        'showfolders': 'true'
+      }
+    };
+    DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl, processLoad, params);
+  };
+
+  /**
+   * add new information to the spreadsheet. 
+   * @param {array}    data array of data to be saved.  Make sure the order of the info inside the array matches the column order from init
+   * @param {Function} cb   callback function
+   */
+  var add = function(data,cb){
+    _options.cb = (typeof cb === "function") ? cb : null;
+    var params = {
+      'method': 'POST',
+      'headers': {
+        'GData-Version': '3.0',
+        'Content-Type': 'application/atom+xml'
+      },
+      'body': constructSpreadAtomXml_(data)
+    };
+    DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl, processAdd, params);
+  };
+
+  /**
+   * Cunstructs an AtomXML string that google uses to add information to a spreadsheet
+   * @param  {array} data  array of info to be inserted into a spreadsheeet.  The order of the array must be in the same order as columns
+   * @return {string}      the constructed AtomXML string
+   */
+  var constructSpreadAtomXml_ = function(data) {
+    var atomXML = '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">\n';
+
+    var cols = _options.columns;
+    for (var i=0; i < cols.length; i++){
+      atomXML += '<gsx:' + cols[i] + '>' + data[i] + '</gsx:' + cols[i] +'>\n';
+    }
+    atomXML += '</entry>';
+    return atomXML;
+  };
+
+  var processAdd = function(response,xhr){
+    if (xhr.status !== 201) {
+      _response = {success:false, message: xhr.status + ": error saving"};
+      console.warn(xhr);
+    } else {
+      _response = {success:true, message: 'saved successfully'};
+    }
+    DrivePass.Signal.broadcast('gs_data_added', _response);
+
+    // TODO: maybe use pubsub instead of callback
+    if (_options.cb !== null) {
+      _options.cb(_response);
+    }
+    return _response;
+  };
+
+  /*
+    example usage and required parameters
+    var spreadsheet = Googlespreadsheet.init({
+      sheet_url : 'http://link.to.your?spreadsheet'
+      columns : ["an","array","of","column","names","as","strings"]
+    })
+    
+    !! pay attention to the order of the column names in the array
+    !! you'll need to match when inserting new cells 
+
+  */
+
+  var init = function(options) {
+    _options = options || {};
+
+    if (typeof _options.sheet_url !== 'string' || typeof _options.columns !== 'object') {
+      throw new Error('Missing sheet_url or columns from init options');
+    }
+
+    var url,
+        key,
+        sourceIdentifier = _options.sheet_url;
+    if (sourceIdentifier.match(/http(s)*:/)) {
+      url = sourceIdentifier;
+      try {
+        key = url.match(/key=(.*?)(&|#)/)[1];
+      } catch (error) {
+        key = url.match(/(cells|list)\/(.*?)\//)[2];
+      }
+    } else {
+      key = sourceIdentifier;
+    }
+    _options.jsonListUrl = "https://spreadsheets.google.com/feeds/list/" + key + '/od6/private/full';
+    _options.jsonCellsUrl = "https://spreadsheets.google.com/feeds/cells/" + key + '/od6/private/basic';
+    
+    return this;
+  };
+
+  return {
+    init:init,
+    load:load,
+    add:add
+  };
+
+});
+var DrivePass = DrivePass || {};
+
+DrivePass.Generator = (function(){
+  var $uc = document.getElementById('uppercase'),
+      $lc = document.getElementById('lowercase'),
+      $nums = document.getElementById('numbers'),
+      $show_symbols = document.getElementById('show_symbols'),
+      $symbols = document.getElementById('symbols'),
+      $pw = document.getElementById('pw');
+
+  var getValues = function(){
+    var includeChar ='',
+        count = 0,
+        charset = '',
+        passLength = document.getElementById('digits').value || 15;
+
+    if (passLength < 2){ passLength = 7; }
+    [$uc,$lc,$nums].forEach(function(e){
+      if (e.checked === true) {
+        charset += e.value;
+        //make sure at least 1 of the chosen characters are used
+        var n = e.value.length;
+        includeChar += e.value.charAt(Math.floor(Math.random() * n));
+        count++;
+      }
+    });
+    if ($show_symbols.checked === true) {
+      charset += $symbols.value;
+      var n = $symbols.value.length;
+      includeChar += $symbols.value.charAt(Math.floor(Math.random() * n));
+      count++;
+    }
+    return [passLength,charset,includeChar,count];
+  };
+
+  var generatePassword = function(e){
+    e.preventDefault();
+    var vals = getValues(),
+        length = vals[0] - vals[3],
+        charset = vals[1],
+        retVal = "";
+    for (var i = 0, n = charset.length; i < length; ++i) {
+        retVal += charset.charAt(Math.floor(Math.random() * n));
+    }
+    retVal += vals[2];
+    $pw.textContent = retVal;
+    $pw.className = "generated";
+    return true;
+  };
+
+  var init = function(){
+    document.getElementById('makePassword').addEventListener('click',generatePassword,false);
+  };
+
+  return {
+    init:init
+  };
+});
+var DrivePass = DrivePass || {};
+
+DrivePass.Popup = (function() {
+
+  // caching DOM elements
+  // I'm not using jQuery so the $ represents element IDs only
+  var $loading = document.getElementById('loading'),
+      $status = document.getElementById('status'),
+      $un = document.getElementById('un'),
+      $pw = document.getElementById('pw'),
+      $add = document.getElementById('add'),
+      $theInfo = document.getElementById('theInfo'),
+      theData = JSON.parse(localStorage.getItem('_data')),
+      activeUrl;
+
+  var Sheet = new DrivePass.GoogleSpreadsheet();
+
+  Sheet.init({
+    sheet_url : localStorage.getItem('sheet_url'),
+    columns : ['site','username','password']
+  });
+
+ /**
+  * Searches through the spreadsheet data for the matching domain
+  * @param  {object}  data - json object
+  * @param  {string}  tabDomain
+  * @return {array}   [username,password]
+  */
+  var findPW = function(data,tabDomain) {
+    var _data = data || {};
+    if (Object.keys(_data).length) {
+      for (var prop in _data) {
+        if (tabDomain.indexOf(_data[prop].site) !== -1) {
+          var result = [];
+          result.push(_data[prop].username,_data[prop].password);
+          return result;
+        }
+      }
+    } else {
+      console.warn('findPW: data not an object');
+    }
+  };
+
+  /**
+   * Updates the status element ID and displays it
+   * @param  {string} status
+   * @param  {string} message
+   */
+  var handleStatus = function(status,message) {
+    var stat = status || '';
+    var msg = message || '';
+    if (stat !== '' && msg !== '') {
+      $status.textContent = msg;
+      $status.className = stat;
+      $status.style.display = "block";
+    }
+  };
+
+  /**
+   * run on successful load of google spreadsheet
+   * @param  {object} result  - json object
+   */
+  var onSuccess = function(result){
+    $loading.style.display = "none";
+    handleStatus('success','password found');
+    $un.textContent = result[0];
+    $pw.textContent = result[1];
+    
+    DrivePass.Browser.sendToPage({username: result[0], password: result[1]});
+    
+    $add.textContent = "update";
+  };
+
+  /**
+   * handle UI updates when password not found
+   */
+  var pwNotFound = function(){
+    $loading.style.display = "none";
+    handleStatus('error','password not found');
+    utils.toggle($theInfo);
+  };
+
+  /**
+   * bind the event listener that handles adding a new entry into the google spreadheet
+   */
+  var bindAdd = function(){
+    $add.addEventListener('click', function(evt) {
+      var un = document.getElementById('un').textContent;
+      var pw = document.getElementById('pw').textContent;
+      var data = [activeUrl,un,pw];
+      Sheet.add(data,function(result){
+        if (result.success === false){
+          handleStatus('error',result.message);
+        } else {
+          handleStatus('success', result.message);
+        }
+      });
+    },false);
+  };
+
+  var initCb = function(){
+    /*
+    TODO: check local storage option and either run below or do sheet.load with callback
+    */
+    activeUrl = DrivePass.Browser.activeTabUrl;
+    var found = findPW(theData.sheetData,activeUrl);
+    if (typeof found === 'undefined') {
+      pwNotFound();
+    } else {
+      onSuccess(found);
+    }
+  };
+
+  var init = function() {
+    if (theData === null) {
+      DrivePass.Signal.listen('gs_data_loaded', function(topic,response_data){
+        localStorage.setItem('_data', JSON.stringify(response_data));
+        if (response_data.success === true) {
+          theData = response_data;
+          DrivePass.Browser.getActiveTab(initCb);
+        }
+      });
+      Sheet.load();
+    } else {
+      DrivePass.Browser.getActiveTab(initCb);
+    }
+
+    bindAdd();
+  };
+
+  return {
+    init: init
+  };
+});
+/*  
+* Super simple JS router, like super super simple
+*
+* Because Chrome Extensions don't allow you to run 'external' scripts (which include inline scripts)
+* I'm placing the route for the document as a data attribute of the body tag
+* <body data-route="popup">
+* it then looks for the function that matches that route and runs it
+*
+*/
+
+var DrivePass = DrivePass || {};
+
+DrivePass.Router = (function() {
+  function Router(info) {
+    this.methods = info;
+    this.process();
+  }
+
+  Router.prototype.process = function() {
+    // always run what's in 'universal' before other routes
+    this.methods.universal(); 
+    var route = document.body.dataset.route;
+    // only want to process defined routes
+    if (typeof route !== 'undefined') {
+      var execRoute = this.methods[route];
+      if (typeof execRoute === 'function') { 
+        execRoute(); 
+      }
+    }
+  };
+
+  return Router;
+
+})();
+var DrivePass = DrivePass || {};
+
+DrivePass.Signal = (function(){
+    'use strict';
+
+    var topics = {}, 
+        subUid = -1;
+    
+    var listen = function(topic, func) {
+        if (!topics[topic]) {
+            topics[topic] = [];
+        }
+        var token = (++subUid).toString();
+        topics[topic].push({
+            token: token,
+            func: func
+        });
+        return token;
+    };
+ 
+    var broadcast = function(topic, args) {
+        if (!topics[topic]) {
+            return false;
+        }
+        setTimeout(function() {
+            var subscribers = topics[topic],
+                len = subscribers ? subscribers.length : 0;
+ 
+            while (len--) {
+                subscribers[len].func(topic, args);
+            }
+        }, 0);
+        return true;
+    };
+ 
+    var stop = function(token) {
+        for (var m in topics) {
+            if (topics[m]) {
+                for (var i = 0, j = topics[m].length; i < j; i++) {
+                    if (topics[m][i].token === token) {
+                        topics[m].splice(i, 1);
+                        return token;
+                    }
+                }
+            }
+        }
+        return false;
+    };
+    return {
+        broadcast : broadcast,
+        listen : listen,
+        stop : stop
+    };
+})();
+var utils = {
+  /**
+   * Add or remove the css class "show" from a DOM element
+   * @param {object}  elm  - A DOM element 
+   */
+  toggle: function(elm) {
+    if (elm.classList.contains("show")) {
+      elm.classList.remove('show');
+    } else {
+      elm.classList.add('show');
+    }
+  },
+  
+  /**
+   * simple toggler to add/remove a class that uses CSS3 transition to show/hide an element
+   * @param  {string}   handler 
+   * @param  {string}   targ
+   */
+  toggler: function(handler,targ) {
+    var self = this;
+    var elm = document.getElementById(targ);
+    document.getElementById(handler).addEventListener('click',function(e){
+      self.toggle(elm);
+    },false);
+  },
+
+  /**
+    * gets the hostname from a URL string
+    * @param  {string}  a full url
+    * @return {string}
+    */
+  getHostname: function(url){
+    // letting the browser give me the hostname, easier than a regex
+    // inspired by: http://stackoverflow.com/a/12470263
+    var _url = url || "",
+        a = document.createElement('a');
+    if (_url !== ""){
+      a.href = _url;
+      return a.hostname;
+    } else {
+      console.warn('url undefined');
+      return false;
+    }
+  }
+
+};
+var DrivePass = DrivePass || {};
+
+DrivePass.ext = new DrivePass.Router({
+
+  universal : function(){
+    DrivePass.Settings = JSON.parse(localStorage.getItem('options')) || {};
+    // setting some defaults if not chosen
+    DrivePass.Settings.keeplocal = DrivePass.Settings.keeplocal || true;
+    DrivePass.Settings.route = document.body.dataset.route;
+  },
+
+  popup : function() {
+    var initUI = function(){
+      utils.toggler('showGPoptions','gpOptions');
+      utils.toggler('showInfo','theInfo');
+      utils.toggler('show_symbols','hidden_symbols');
+    };
+
+    var popup = new DrivePass.Popup();
+    var generate = new DrivePass.Generator();
+    
+    document.addEventListener('DOMContentLoaded', function(e) {
+      if (this.bDone) {
+        return; // deal with DOMContentLoaded being fired twice for some reason
+      }
+      this.bDone = true;
+      generate.init();
+      popup.init();
+      initUI();
+    });
+  },
+
+  chrome_options : function() {
+    var Sheet = new DrivePass.GoogleSpreadsheet();
+    Sheet.init({
+      sheet_url : localStorage.getItem('sheet_url'),
+      columns : ['site','username','password']
+    });
+   
+    // Saves options to localStorage.
+    function save_options() {
+      localStorage.setItem("sheet_url", document.getElementById("sheet_url").value);
+      // load data into locatStorage upon saving
+      DrivePass.Signal.listen('gs_data_loaded', function(topic,response_data){
+        localStorage.setItem('_data', JSON.stringify(response_data));
+      });
+      Sheet.load();
+      // Update status to let user know options were saved.
+      document.getElementById("status").textContent = "Options Saved.";
+    }
+
+    // Populates the input box with the saved url if it exists
+    function restore_options() {
+      var curr_url = localStorage.getItem("sheet_url");
+      if (curr_url === null || curr_url === "") {
+        return false;
+      } else {
+        document.getElementById("sheet_url").value = curr_url;
+        document.getElementById("save").textContent = "update";
+        var sheetJump = document.getElementById("goToSheet");
+        sheetJump.href = curr_url;
+        sheetJump.style.display = "block";
+      }
+    }
+    document.addEventListener('DOMContentLoaded', restore_options);
+    document.getElementById('save').addEventListener('click', save_options);
+  }
+
+});

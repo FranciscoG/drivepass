@@ -1,0 +1,8 @@
+# ignoring files from src #
+css/shared.css
+css/fonts/*
+js/drivepass*.*
+*.png
+*.jpg
+*.gif
+*.svg

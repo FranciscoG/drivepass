@@ -4,6 +4,8 @@ DrivePass.ext = new DrivePass.Router({
 
   universal : function(){
     DrivePass.Settings = JSON.parse(localStorage.getItem('options')) || {};
+    // setting some defaults if not chosen
+    DrivePass.Settings.keeplocal = DrivePass.Settings.keeplocal || true;
     DrivePass.Settings.route = document.body.dataset.route;
   },
 
@@ -29,19 +31,20 @@ DrivePass.ext = new DrivePass.Router({
   },
 
   chrome_options : function() {
-    /*
-    TODO:  
-    - add option whether to store db locally or not, read that option in googlespreadsheet module
-    - store new option pref in localStorage
-    - add ability to clear out local cache
-    - when turning off option (setting it to false), clear out localStorage sheet data
-    - if sheet_url not set, add/show a link to "drive.google.com"
-    - UI updates all around
-    */
+    var Sheet = new DrivePass.GoogleSpreadsheet();
+    Sheet.init({
+      sheet_url : localStorage.getItem('sheet_url'),
+      columns : ['site','username','password']
+    });
    
     // Saves options to localStorage.
     function save_options() {
       localStorage.setItem("sheet_url", document.getElementById("sheet_url").value);
+      // load data into locatStorage upon saving
+      DrivePass.Signal.listen('gs_data_loaded', function(topic,response_data){
+        localStorage.setItem('_data', JSON.stringify(response_data));
+      });
+      Sheet.load();
       // Update status to let user know options were saved.
       document.getElementById("status").textContent = "Options Saved.";
     }
@@ -49,7 +52,7 @@ DrivePass.ext = new DrivePass.Router({
     // Populates the input box with the saved url if it exists
     function restore_options() {
       var curr_url = localStorage.getItem("sheet_url");
-      if (!curr_url || curr_url === "") {
+      if (curr_url === null || curr_url === "") {
         return false;
       } else {
         document.getElementById("sheet_url").value = curr_url;

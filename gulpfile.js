@@ -1,7 +1,7 @@
 var gulp = require('gulp'),
     gutil = require('gulp-util'),
     uglify = require('gulp-uglify'),
-    changed = require('gulp-changed'),
+    //changed = require('gulp-changed'),
     concat = require('gulp-concat'),
     jshint = require('gulp-jshint'),
     stylish = require('jshint-stylish'),
@@ -15,16 +15,23 @@ var main = "src/main.js";
 // Global setting to state which browser you are building for
 var buildFor = "Chrome";
 /************************************************************/
-
+function timestamp(){
+  var currentdate = new Date(); 
+  return datetime = "Last update: " + currentdate.getDate() + "/"
+    + (currentdate.getMonth()+1)  + "/" 
+    + currentdate.getFullYear() + " @ "  
+    + currentdate.getHours() + ":"  
+    + currentdate.getMinutes() + ":" 
+    + currentdate.getSeconds();
+}
 function moveStuff(cfg) {
   return gulp.src(cfg.src)
-    .pipe(changed(cfg.src))
     .pipe(gulp.dest(cfg.dest));
 }
 function exportTo(_dest){
   moveStuff({src: "src/css/*", dest: _dest+"/css"});
   moveStuff({src: "src/build/*", dest: _dest+"/js"});
-  return moveStuff({src: "src/img/*", dest: _dest+"/img"});
+  moveStuff({src: "src/img/*", dest: _dest+"/img"});
 }
 
 gulp.task('lint', function() {
@@ -32,10 +39,8 @@ gulp.task('lint', function() {
         gulp.src(modules),
         gulp.src(main)
     )
-    .pipe(changed('src', { extension: '.js' }))
     .pipe(jshint('.jshintrc'))
-    .pipe(jshint.reporter(stylish))
-    .pipe(jshint.reporter('fail'));
+    .pipe(jshint.reporter(stylish));
 });
 
 gulp.task('concat',['lint'], function(){
@@ -56,10 +61,12 @@ gulp.task('uglify', ['concat'], function(){
 
 gulp.task('export', ['uglify'], function() {
   exportTo(buildFor);
+  return console.log(timestamp());
 });
 
 gulp.task('watch', ['export'], function(){
-  gulp.watch('src/*.js', ['export']);
+  gulp.watch(modules, ['export']);
+  gulp.watch(main, ['export']);
   gulp.watch('src/css/*.css', ['export']);
   gulp.watch('src/img/**', ['export']);
 });

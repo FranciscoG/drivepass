@@ -20,11 +20,6 @@ DrivePass.Popup = (function() {
     columns : ['site','username','password']
   });
 
-  if (theData === null) {
-    Sheet.load();
-    theData = JSON.parse(localStorage.getItem('_data'));
-  }
-
  /**
   * Searches through the spreadsheet data for the matching domain
   * @param  {object}  data - json object
@@ -114,11 +109,22 @@ DrivePass.Popup = (function() {
     } else {
       onSuccess(found);
     }
-    
   };
 
   var init = function() {
-    DrivePass.Browser.getActiveTab(initCb);
+    if (theData === null) {
+      DrivePass.Signal.listen('gs_data_loaded', function(topic,response_data){
+        localStorage.setItem('_data', JSON.stringify(response_data));
+        if (response_data.success === true) {
+          theData = response_data;
+          DrivePass.Browser.getActiveTab(initCb);
+        }
+      });
+      Sheet.load();
+    } else {
+      DrivePass.Browser.getActiveTab(initCb);
+    }
+
     bindAdd();
   };
 
