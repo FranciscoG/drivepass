@@ -90,12 +90,13 @@ DrivePass.GoogleSpreadsheet = (function(){
 
   /*
     https://developers.google.com/google-apps/spreadsheets/?hl=fr-FR#updating_a_list_row
+    https://developers.google.com/gdata/docs/2.0/reference#ResourceVersioning
  */
   var constructUpdateSpreadAtomXml_ = function(key,data) {
     var _key = "74";
     var edit_id = _options.jsonListUrl + '/' + _key;
     var etag = JSON.parse(localStorage.getItem("_full"));
-    var atomXML = '<entry gd:etag="'+ etag.feed.gd$etag +'">\n';
+    var atomXML = "<entry gd:etag='\""+ etag.feed.gd$etag +"\"'>\n";
     atomXML += '<id>' + edit_id + '</id>\n';
     atomXML += '<updated>' + etag.feed.updated.$t + '</updated>\n';
     atomXML += '<category scheme="http://schemas.google.com/spreadsheets/2006" term="http://schemas.google.com/spreadsheets/2006#list"/>\n';
@@ -120,7 +121,7 @@ DrivePass.GoogleSpreadsheet = (function(){
       },
       'body': constructUpdateSpreadAtomXml_(key,data)
     };
-    DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl, processUpdate, params);
+    DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl+'/74', processUpdate, params);
   };
 
   var processAdd = function(response,xhr){

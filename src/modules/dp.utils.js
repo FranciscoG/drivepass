@@ -43,6 +43,10 @@ var utils = {
     }
   },
 
+  addslashes: function( str ) {
+    return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
+  },
+
   global: function(){
     /* lightweight jQuery */ 
     var fakeQuery = function(el) {
