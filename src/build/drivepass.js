@@ -103,6 +103,7 @@ DrivePass.GoogleSpreadsheet = (function(){
     } else {
       _response = {success:true, message: 'spreadsheet successfully loaded'};
       _response.sheetData = filterResults(response);
+      localStorage.setItem('_full', response);
     }
     DrivePass.Signal.broadcast('gs_data_loaded', _response);
 
@@ -160,6 +161,41 @@ DrivePass.GoogleSpreadsheet = (function(){
     return atomXML;
   };
 
+  /*
+    https://developers.google.com/google-apps/spreadsheets/?hl=fr-FR#updating_a_list_row
+ */
+  var constructUpdateSpreadAtomXml_ = function(key,data) {
+    var _key = "74";
+    var edit_id = _options.jsonListUrl + '/' + _key;
+    var etag = JSON.parse(localStorage.getItem("_full"));
+    var atomXML = '<entry gd:etag="'+ etag.feed.gd$etag +'">\n';
+    atomXML += '<id>' + edit_id + '</id>\n';
+    atomXML += '<updated>' + etag.feed.updated.$t + '</updated>\n';
+    atomXML += '<category scheme="http://schemas.google.com/spreadsheets/2006" term="http://schemas.google.com/spreadsheets/2006#list"/>\n';
+    atomXML += '<link rel="self" type="application/atom+xml" href="'+edit_id+'"/>\n';
+    atomXML += '<link rel="edit" type="application/atom+xml" href="'+edit_id+'"/>\n';
+    var cols = _options.columns;
+    for (var i=0; i < cols.length; i++){
+      atomXML += '<gsx:' + cols[i] + '>' + data[i] + '</gsx:' + cols[i] +'>\n';
+    }
+    atomXML += '</entry>';
+    console.log(atomXML);
+    return atomXML;
+  };
+
+  var update = function(key,data,cb){
+    _options.cb = (typeof cb === "function") ? cb : null;
+    var params = {
+      'method': 'PUT',
+      'headers': {
+        'GData-Version': '3.0',
+        'Content-Type': 'application/atom+xml'
+      },
+      'body': constructUpdateSpreadAtomXml_(key,data)
+    };
+    DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl, processUpdate, params);
+  };
+
   var processAdd = function(response,xhr){
     if (xhr.status !== 201) {
       _response = {success:false, message: xhr.status + ": error saving"};
@@ -174,6 +210,26 @@ DrivePass.GoogleSpreadsheet = (function(){
       _options.cb(_response);
     }
     return _response;
+  };
+
+  var processUpdate = function(response,xhr){
+    console.log(xhr);
+    console.log(response);
+    return;
+    /*
+    if (xhr.status !== 201) {
+      _response = {success:false, message: xhr.status + ": error saving"};
+      console.warn(xhr);
+    } else {
+      _response = {success:true, message: 'saved successfully'};
+    }
+    DrivePass.Signal.broadcast('gs_data_updated', _response);
+
+    if (_options.cb !== null) {
+      _options.cb(_response);
+    }
+    return _response;
+    */
   };
 
   /*
@@ -210,14 +266,14 @@ DrivePass.GoogleSpreadsheet = (function(){
     }
     _options.jsonListUrl = "https://spreadsheets.google.com/feeds/list/" + key + '/od6/private/full';
     _options.jsonCellsUrl = "https://spreadsheets.google.com/feeds/cells/" + key + '/od6/private/basic';
-    
     return this;
   };
 
   return {
     init:init,
     load:load,
-    add:add
+    add:add,
+    update:update
   };
 
 });
@@ -290,7 +346,9 @@ DrivePass.Popup = (function() {
       $un = document.getElementById('un'),
       $pw = document.getElementById('pw'),
       $add = document.getElementById('add'),
+      $update = document.getElementById('update'),
       $theInfo = document.getElementById('theInfo'),
+      $hiddenSite = document.getElementById('hdnSite'),
       theData = JSON.parse(localStorage.getItem('_data')),
       activeUrl;
 
@@ -313,7 +371,7 @@ DrivePass.Popup = (function() {
       for (var prop in _data) {
         if (tabDomain.indexOf(_data[prop].site) !== -1) {
           var result = [];
-          result.push(_data[prop].username,_data[prop].password);
+          result.push(_data[prop].username,_data[prop].password,_data[prop].site);
           return result;
         }
       }
@@ -346,10 +404,12 @@ DrivePass.Popup = (function() {
     handleStatus('success','password found');
     $un.textContent = result[0];
     $pw.textContent = result[1];
+    $hiddenSite.value = result[2];
     
     DrivePass.Browser.sendToPage({username: result[0], password: result[1]});
     
-    $add.textContent = "update";
+    utils.toggle($add);
+    utils.toggle($update);
   };
 
   /**
@@ -377,6 +437,32 @@ DrivePass.Popup = (function() {
         }
       });
     },false);
+  };
+
+  var bindUpdate = function(){
+    $update.addEventListener('click', function(evt){
+      var _site = $hiddenSite.value;
+      var data_key = findKey(theData.sheetData, _site);
+      var un = document.getElementById('un').textContent;
+      var pw = document.getElementById('pw').textContent;
+      var data = [_site,un,pw];
+      Sheet.update(data_key, data);
+    }, false);
+  };
+
+  /**
+   * Get Object key that matches site name, used when update information
+   * @param  {object} sheetData the spreadsheet data object
+   * @param  {string} site      the website that you're trying to change data for
+   * @return {string}           the object key
+   */
+  var findKey = function(sheetData,site){
+    for (var keys in sheetData) { 
+      if (sheetData[keys].site === site){
+        var keyfound = parseFloat(keys)+2;
+        return keyfound.toString();
+      }
+    }
   };
 
   var initCb = function(){
@@ -407,6 +493,7 @@ DrivePass.Popup = (function() {
     }
 
     bindAdd();
+    bindUpdate();
   };
 
   return {
@@ -544,6 +631,13 @@ var utils = {
       console.warn('url undefined');
       return false;
     }
+  },
+
+  global: function(){
+    /* lightweight jQuery */ 
+    var fakeQuery = function(el) {
+      return Array.prototype.slice.call(document.querySelectorAll(el));
+    };
   }
 
 };

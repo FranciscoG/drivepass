@@ -9,7 +9,9 @@ DrivePass.Popup = (function() {
       $un = document.getElementById('un'),
       $pw = document.getElementById('pw'),
       $add = document.getElementById('add'),
+      $update = document.getElementById('update'),
       $theInfo = document.getElementById('theInfo'),
+      $hiddenSite = document.getElementById('hdnSite'),
       theData = JSON.parse(localStorage.getItem('_data')),
       activeUrl;
 
@@ -32,7 +34,7 @@ DrivePass.Popup = (function() {
       for (var prop in _data) {
         if (tabDomain.indexOf(_data[prop].site) !== -1) {
           var result = [];
-          result.push(_data[prop].username,_data[prop].password);
+          result.push(_data[prop].username,_data[prop].password,_data[prop].site);
           return result;
         }
       }
@@ -65,10 +67,12 @@ DrivePass.Popup = (function() {
     handleStatus('success','password found');
     $un.textContent = result[0];
     $pw.textContent = result[1];
+    $hiddenSite.value = result[2];
     
     DrivePass.Browser.sendToPage({username: result[0], password: result[1]});
     
-    $add.textContent = "update";
+    utils.toggle($add);
+    utils.toggle($update);
   };
 
   /**
@@ -96,6 +100,32 @@ DrivePass.Popup = (function() {
         }
       });
     },false);
+  };
+
+  var bindUpdate = function(){
+    $update.addEventListener('click', function(evt){
+      var _site = $hiddenSite.value;
+      var data_key = findKey(theData.sheetData, _site);
+      var un = document.getElementById('un').textContent;
+      var pw = document.getElementById('pw').textContent;
+      var data = [_site,un,pw];
+      Sheet.update(data_key, data);
+    }, false);
+  };
+
+  /**
+   * Get Object key that matches site name, used when update information
+   * @param  {object} sheetData the spreadsheet data object
+   * @param  {string} site      the website that you're trying to change data for
+   * @return {string}           the object key
+   */
+  var findKey = function(sheetData,site){
+    for (var keys in sheetData) { 
+      if (sheetData[keys].site === site){
+        var keyfound = parseFloat(keys)+2;
+        return keyfound.toString();
+      }
+    }
   };
 
   var initCb = function(){
@@ -126,6 +156,7 @@ DrivePass.Popup = (function() {
     }
 
     bindAdd();
+    bindUpdate();
   };
 
   return {

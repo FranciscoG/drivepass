@@ -41,6 +41,13 @@ var utils = {
       console.warn('url undefined');
       return false;
     }
+  },
+
+  global: function(){
+    /* lightweight jQuery */ 
+    var fakeQuery = function(el) {
+      return Array.prototype.slice.call(document.querySelectorAll(el));
+    };
   }
 
 };
