@@ -32,14 +32,15 @@ DrivePass.ext = new DrivePass.Router({
 
   chrome_options : function() {
     var Sheet = new DrivePass.GoogleSpreadsheet();
-    Sheet.init({
-      sheet_url : localStorage.getItem('sheet_url'),
-      columns : ['site','username','password']
-    });
-   
+    utils.toggler('inst_link','instructions');
     // Saves options to localStorage.cc
     function save_options() {
-      localStorage.setItem("sheet_url", document.getElementById("sheet_url").value);
+      var sheet_url_val = document.getElementById("sheet_url").value;
+      localStorage.setItem("sheet_url", sheet_url_val);
+      Sheet.init({
+        sheet_url : sheet_url_val,
+        columns : ['site','username','password']
+      });
       // load data into locatStorage upon saving
       DrivePass.Signal.listen('gs_data_loaded', function(topic,response_data){
         localStorage.setItem('_data', JSON.stringify(response_data));

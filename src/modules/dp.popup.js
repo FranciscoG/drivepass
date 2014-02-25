@@ -13,6 +13,7 @@ DrivePass.Popup = (function() {
       $theInfo = document.getElementById('theInfo'),
       $hiddenSite = document.getElementById('hdnSite'),
       theData = JSON.parse(localStorage.getItem('_data')),
+      fullData = JSON.parse(localStorage.getItem('_full')),
       activeUrl;
 
   var Sheet = new DrivePass.GoogleSpreadsheet();
@@ -105,25 +106,23 @@ DrivePass.Popup = (function() {
   var bindUpdate = function(){
     $update.addEventListener('click', function(evt){
       var _site = $hiddenSite.value;
-      var data_key = findKey(theData.sheetData, _site);
+      var entry = findEntry(_site);
       var un = document.getElementById('un').textContent;
       var pw = document.getElementById('pw').textContent;
       var data = [_site,un,pw];
-      Sheet.update(data_key, data);
+      Sheet.update(entry,data);
     }, false);
   };
 
   /**
    * Get Object key that matches site name, used when update information
-   * @param  {object} sheetData the spreadsheet data object
    * @param  {string} site      the website that you're trying to change data for
    * @return {string}           the object key
    */
-  var findKey = function(sheetData,site){
-    for (var keys in sheetData) { 
-      if (sheetData[keys].site === site){
-        var keyfound = parseFloat(keys)+2;
-        return keyfound.toString();
+  var findEntry = function(site){
+    for (var entry in fullData.feed.entry) { 
+      if (fullData.feed.entry[entry].gsx$site.$t === site){
+        return fullData.feed.entry[entry];
       }
     }
   };
@@ -147,6 +146,7 @@ DrivePass.Popup = (function() {
         localStorage.setItem('_data', JSON.stringify(response_data));
         if (response_data.success === true) {
           theData = response_data;
+          fullData = JSON.parse(localStorage.getItem('_full'));
           DrivePass.Browser.getActiveTab(initCb);
         }
       });

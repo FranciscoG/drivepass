@@ -48,3 +48,23 @@ body {
   padding:20px;
   background:#eee;
 }
+
+.hover:hover {
+  cursor: pointer;
+}
+
+.hidden {
+  height:0;
+  overflow: hidden;
+  transition: height .3s linear;
+}
+.hidden.show {
+  height: auto !important;
+}
+
+.hide {
+  display: none;
+}
+.hide.show {
+  display:block;
+}

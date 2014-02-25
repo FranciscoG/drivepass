@@ -79,6 +79,7 @@ input[type="checkbox"],
 #digits {
   width:20px;
 }
+
 .hover:hover {
   cursor: pointer;
 }

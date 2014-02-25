@@ -90,28 +90,40 @@ DrivePass.GoogleSpreadsheet = (function(){
 
   /*
     https://developers.google.com/google-apps/spreadsheets/?hl=fr-FR#updating_a_list_row
-    https://developers.google.com/gdata/docs/2.0/reference#ResourceVersioning
+    
+    example entry:
+    <entry xmlns='http://www.w3.org/2005/Atom' xmlns:gsx='http://schemas.google.com/spreadsheets/2006/extended'>  
+    <id>https://spreadsheets.google.com/feeds/list/0AutNQyCIKVnndDB3WUFKRmZ6Y1BlRXcxY0p5VDlUbGc/od6/private/full/agihe</id>
+    <updated>2014-02-25T05:51:56.809Z</updated>
+    <category scheme='http://schemas.google.com/spreadsheets/2006' term='http://schemas.google.com/spreadsheets/2006#list'/>
+    <title type='text'>test_test</title>
+    <content type='text'>username: test, password: test</content> 
+    <link rel='self' type='application/atom+xml' href='https://spreadsheets.google.com/feeds/list/0AutNQyCIKVnndDB3WUFKRmZ6Y1BlRXcxY0p5VDlUbGc/od6/private/full/agihe'/>
+    <link rel='edit' type='application/atom+xml' href='https://spreadsheets.google.com/feeds/list/0AutNQyCIKVnndDB3WUFKRmZ6Y1BlRXcxY0p5VDlUbGc/od6/private/full/agihe/gglbng5oc977'/> 
+    <gsx:site>test_test</gsx:site>
+    <gsx:username>test</gsx:username>
+    <gsx:password>test</gsx:password>
+    </entry>
  */
-  var constructUpdateSpreadAtomXml_ = function(key,data) {
-    var _key = "74";
-    var edit_id = _options.jsonListUrl + '/' + _key;
-    var etag = JSON.parse(localStorage.getItem("_full"));
-    var atomXML = "<entry gd:etag='\""+ etag.feed.gd$etag +"\"'>\n";
-    atomXML += '<id>' + edit_id + '</id>\n';
-    atomXML += '<updated>' + etag.feed.updated.$t + '</updated>\n';
+  var constructUpdateSpreadAtomXml_ = function(entry,data) {
+    var atomXML = "<entry xmlns='http://www.w3.org/2005/Atom' xmlns:gsx='http://schemas.google.com/spreadsheets/2006/extended' ";
+    atomXML += "xmlns:gd='http://schemas.google.com/g/2005' gd:etag='"+ entry.gd$etag +"'>\n";
+    atomXML += '<id>' + entry.id.$t + '</id>\n';
+    atomXML += '<updated>' + entry.updated.$t + '</updated>\n';
     atomXML += '<category scheme="http://schemas.google.com/spreadsheets/2006" term="http://schemas.google.com/spreadsheets/2006#list"/>\n';
-    atomXML += '<link rel="self" type="application/atom+xml" href="'+edit_id+'"/>\n';
-    atomXML += '<link rel="edit" type="application/atom+xml" href="'+edit_id+'"/>\n';
+    atomXML += "<title type='text'>" + entry.title.$t + "</title>\n";
+    atomXML +=  "<content type='text'>"+ entry.content.$t +"</content>\n";
+    atomXML += '<link rel="self" type="application/atom+xml" href="'+entry.link[0].href+'"/>\n';
+    atomXML += '<link rel="edit" type="application/atom+xml" href="'+entry.link[1].href+'"/>\n';
     var cols = _options.columns;
     for (var i=0; i < cols.length; i++){
       atomXML += '<gsx:' + cols[i] + '>' + data[i] + '</gsx:' + cols[i] +'>\n';
     }
     atomXML += '</entry>';
-    console.log(atomXML);
     return atomXML;
   };
 
-  var update = function(key,data,cb){
+  var update = function(entry,data,cb){
     _options.cb = (typeof cb === "function") ? cb : null;
     var params = {
       'method': 'PUT',
@@ -119,9 +131,9 @@ DrivePass.GoogleSpreadsheet = (function(){
         'GData-Version': '3.0',
         'Content-Type': 'application/atom+xml'
       },
-      'body': constructUpdateSpreadAtomXml_(key,data)
+      'body': constructUpdateSpreadAtomXml_(entry,data)
     };
-    DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl+'/74', processUpdate, params);
+    DrivePass.Browser.oAuthSendRequest(entry.link[1].href, processUpdate, params);
   };
 
   var processAdd = function(response,xhr){
