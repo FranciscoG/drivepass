@@ -170,7 +170,7 @@ DrivePass.Popup = (function() {
         filteredData = filterResults(response_data.sheetData);
         localStorage.setItem('_data', JSON.stringify(filteredData));
         if (typeof cb === "function") {
-          DrivePass.Browser.getActiveTab(initCb);
+          cb();
         }
       }
     });
