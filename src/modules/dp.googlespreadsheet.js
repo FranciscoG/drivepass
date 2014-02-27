@@ -5,32 +5,13 @@ DrivePass.GoogleSpreadsheet = (function(){
   var _options = {},
       _response;
 
-  var filterResults = function(response){
-    var data = JSON.parse(response);
-    var _i = 0,
-        _results = {},
-        _entries = data.feed.entry,
-        cols = _options.columns;
-
-    for (var prop in _entries) {
-      _results[_i] = {};
-      for (var n=0; n < cols.length; n++){
-        var gsx = 'gsx$'+cols[n];
-        _results[_i][cols[n]] = _entries[prop][gsx].$t;
-      }
-      _i++;
-    }
-    return _results;
-  };
-
   var processLoad = function(response,xhr){
     if (xhr.status !== 200) {
       _response = {success:false, message: xhr.status + ": Connection Failed"};
       console.warn(xhr);
     } else {
       _response = {success:true, message: 'spreadsheet successfully loaded'};
-      _response.sheetData = filterResults(response);
-      localStorage.setItem('_full', response);
+      _response.sheetData = JSON.parse(response);
     }
     DrivePass.Signal.broadcast('gs_data_loaded', _response);
 
@@ -129,7 +110,8 @@ DrivePass.GoogleSpreadsheet = (function(){
       'method': 'PUT',
       'headers': {
         'GData-Version': '3.0',
-        'Content-Type': 'application/atom+xml'
+        'Content-Type': 'application/atom+xml',
+        'if-match' : '*'
       },
       'body': constructUpdateSpreadAtomXml_(entry,data)
     };
@@ -145,7 +127,6 @@ DrivePass.GoogleSpreadsheet = (function(){
     }
     DrivePass.Signal.broadcast('gs_data_added', _response);
 
-    // TODO: maybe use pubsub instead of callback
     if (_options.cb !== null) {
       _options.cb(_response);
     }
@@ -153,15 +134,11 @@ DrivePass.GoogleSpreadsheet = (function(){
   };
 
   var processUpdate = function(response,xhr){
-    console.log(xhr);
-    console.log(response);
-    return;
-    /*
-    if (xhr.status !== 201) {
-      _response = {success:false, message: xhr.status + ": error saving"};
+    if (xhr.status !== 200) {
+      _response = {success:false, message: xhr.status + ": error updating"};
       console.warn(xhr);
     } else {
-      _response = {success:true, message: 'saved successfully'};
+      _response = {success:true, message: 'update successful'};
     }
     DrivePass.Signal.broadcast('gs_data_updated', _response);
 
@@ -169,7 +146,6 @@ DrivePass.GoogleSpreadsheet = (function(){
       _options.cb(_response);
     }
     return _response;
-    */
   };
 
   /*

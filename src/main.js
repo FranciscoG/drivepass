@@ -4,9 +4,12 @@ DrivePass.ext = new DrivePass.Router({
 
   universal : function(){
     DrivePass.Settings = JSON.parse(localStorage.getItem('options')) || {};
-    // setting some defaults if not chosen
     DrivePass.Settings.keeplocal = DrivePass.Settings.keeplocal || true;
     DrivePass.Settings.route = document.body.dataset.route;
+    DrivePass.Settings.gs_sheet_init = {
+      sheet_url : localStorage.getItem('sheet_url'),
+      columns : ['site','username','password']
+    };
   },
 
   popup : function() {
@@ -37,10 +40,8 @@ DrivePass.ext = new DrivePass.Router({
     function save_options() {
       var sheet_url_val = document.getElementById("sheet_url").value;
       localStorage.setItem("sheet_url", sheet_url_val);
-      Sheet.init({
-        sheet_url : sheet_url_val,
-        columns : ['site','username','password']
-      });
+      DrivePass.Settings.gs_sheet_init.sheet_url = sheet_url_val;
+      Sheet.init(DrivePass.Settings.gs_sheet_init);
       // load data into locatStorage upon saving
       DrivePass.Signal.listen('gs_data_loaded', function(topic,response_data){
         localStorage.setItem('_data', JSON.stringify(response_data));

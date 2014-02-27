@@ -12,16 +12,12 @@ DrivePass.Popup = (function() {
       $update = document.getElementById('update'),
       $theInfo = document.getElementById('theInfo'),
       $hiddenSite = document.getElementById('hdnSite'),
-      theData = JSON.parse(localStorage.getItem('_data')),
+      filteredData = JSON.parse(localStorage.getItem('_data')),
       fullData = JSON.parse(localStorage.getItem('_full')),
       activeUrl;
 
   var Sheet = new DrivePass.GoogleSpreadsheet();
-
-  Sheet.init({
-    sheet_url : localStorage.getItem('sheet_url'),
-    columns : ['site','username','password']
-  });
+  Sheet.init(DrivePass.Settings.gs_sheet_init);
 
  /**
   * Searches through the spreadsheet data for the matching domain
@@ -42,6 +38,24 @@ DrivePass.Popup = (function() {
     } else {
       console.warn('findPW: data not an object');
     }
+  };
+
+  var filterResults = function(response){
+    var data = response || {};
+    var _i = 0,
+        _results = {},
+        _entries = data.feed.entry,
+        cols = DrivePass.Settings.gs_sheet_init.columns;
+
+    for (var prop in _entries) {
+      _results[_i] = {};
+      for (var n=0; n < cols.length; n++){
+        var gsx = 'gsx$'+cols[n];
+        _results[_i][cols[n]] = _entries[prop][gsx].$t;
+      }
+      _i++;
+    }
+    return _results;
   };
 
   /**
@@ -72,8 +86,8 @@ DrivePass.Popup = (function() {
     
     DrivePass.Browser.sendToPage({username: result[0], password: result[1]});
     
-    utils.toggle($add);
-    utils.toggle($update);
+    $add.classList.remove('show');
+    $update.classList.add('show');
   };
 
   /**
@@ -98,6 +112,7 @@ DrivePass.Popup = (function() {
           handleStatus('error',result.message);
         } else {
           handleStatus('success', result.message);
+          resetLocal();
         }
       });
     },false);
@@ -110,19 +125,27 @@ DrivePass.Popup = (function() {
       var un = document.getElementById('un').textContent;
       var pw = document.getElementById('pw').textContent;
       var data = [_site,un,pw];
-      Sheet.update(entry,data);
+      Sheet.update(entry,data,function(result){
+        if (result.success === false){
+          handleStatus('error',result.message);
+        } else {
+          handleStatus('success', result.message);
+          resetLocal(); // reload sheet after update
+        }
+      });
     }, false);
   };
 
   /**
-   * Get Object key that matches site name, used when update information
+   * Get Object key that matches site name, used when updating information
    * @param  {string} site      the website that you're trying to change data for
    * @return {string}           the object key
    */
   var findEntry = function(site){
-    for (var entry in fullData.feed.entry) { 
-      if (fullData.feed.entry[entry].gsx$site.$t === site){
-        return fullData.feed.entry[entry];
+    var _fullSheet = fullData.sheetData;
+    for (var entry in _fullSheet.feed.entry) { 
+      if (_fullSheet.feed.entry[entry].gsx$site.$t === site){
+        return _fullSheet.feed.entry[entry];
       }
     }
   };
@@ -132,7 +155,7 @@ DrivePass.Popup = (function() {
     TODO: check local storage option and either run below or do sheet.load with callback
     */
     activeUrl = DrivePass.Browser.activeTabUrl;
-    var found = findPW(theData.sheetData,activeUrl);
+    var found = findPW(filteredData,activeUrl);
     if (typeof found === 'undefined') {
       pwNotFound();
     } else {
@@ -140,17 +163,24 @@ DrivePass.Popup = (function() {
     }
   };
 
-  var init = function() {
-    if (theData === null) {
-      DrivePass.Signal.listen('gs_data_loaded', function(topic,response_data){
-        localStorage.setItem('_data', JSON.stringify(response_data));
-        if (response_data.success === true) {
-          theData = response_data;
-          fullData = JSON.parse(localStorage.getItem('_full'));
+  var resetLocal = function(cb){
+    Sheet.load(function(response_data){
+      localStorage.setItem('_full', JSON.stringify(response_data));
+      if (response_data.success === true) {
+        filteredData = filterResults(response_data.sheetData);
+        localStorage.setItem('_data', JSON.stringify(filteredData));
+        if (typeof cb === "function") {
           DrivePass.Browser.getActiveTab(initCb);
         }
+      }
+    });
+  };
+
+  var init = function() {
+    if (filteredData === null) {
+      resetLocal(function(){
+        DrivePass.Browser.getActiveTab(initCb);
       });
-      Sheet.load();
     } else {
       DrivePass.Browser.getActiveTab(initCb);
     }

@@ -6,3 +6,4 @@ js/drivepass*.*
 *.jpg
 *.gif
 *.svg
+config.json

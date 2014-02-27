@@ -47,11 +47,30 @@ var utils = {
     return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
   },
 
-  global: function(){
-    /* lightweight jQuery */ 
-    var fakeQuery = function(el) {
-      return Array.prototype.slice.call(document.querySelectorAll(el));
+  getJSON: function(req_url,yay,bummer) {
+    var data,
+        request = new XMLHttpRequest();
+
+    var _noCB = function(){ console.log('');};
+    var success = (typeof yay === 'function') ? yay : _noCB;
+    var fail = (typeof bummer === 'function') ? bummer : _noCB;
+    
+    request.open('GET', req_url, false);
+
+    request.onload = function() {
+      if (request.status >= 200 && request.status < 400){
+        data = JSON.parse(request.responseText);
+        success(data);
+      } else {
+        fail();
+      }
     };
+
+    request.onerror = function() {
+      fail();
+    };
+
+    request.send(null);
   }
 
 };

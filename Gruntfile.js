@@ -54,7 +54,8 @@ module.exports = function(grunt){
           DrivePass : true,
           chrome : true,
           utils : true,
-          Ply : true
+          Ply : true,
+          _ : true
         }
       },
       gruntfile: {
@@ -67,7 +68,7 @@ module.exports = function(grunt){
 
     concat: {
       build: {
-        files: { 'src/build/drivepass.js': [myscripts] }
+        files: { 'src/build/drivepass.js': ['src/libs/*.js', myscripts] }
       }
     },
 

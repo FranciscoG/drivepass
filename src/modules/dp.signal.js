@@ -33,7 +33,7 @@ DrivePass.Signal = (function(){
         return true;
     };
  
-    var stop = function(token) {
+    var off = function(token) {
         for (var m in topics) {
             if (topics[m]) {
                 for (var i = 0, j = topics[m].length; i < j; i++) {
@@ -49,6 +49,6 @@ DrivePass.Signal = (function(){
     return {
         broadcast : broadcast,
         listen : listen,
-        stop : stop
+        off : off
     };
 })();

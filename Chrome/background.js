@@ -1,31 +1,28 @@
-var oauth = ChromeExOAuth.initBackgroundPage({
+var oauth,
+oauth_config = {
   'request_url': 'https://www.google.com/accounts/OAuthGetRequestToken',
   'authorize_url': 'https://www.google.com/accounts/OAuthAuthorizeToken',
   'access_url': 'https://www.google.com/accounts/OAuthGetAccessToken',
   'consumer_key': 'anonymous',
   'consumer_secret': 'anonymous',
-  'scope': 'https://spreadsheets.google.com/feeds/',
-  'app_name': 'Drive Pass Chrome Extension'
-});
+  'scope': 'https://spreadsheets.google.com/feeds/'
+};
 
-/**
- * oAuth callback function, updates the UI.  Very minimal, more designed page to come
- * @param  {string}   resp : the respnse string sent by the oAuth extension when successfully authorized
- * @param  {object}   xhr  : the ajax response object with http code, etc
- */
-function callback(resp, xhr) {
-  docBody = document.getElementsByTagName('body');
-  docBody.innerHTML = resp;
+var app_name = localStorage.getItem('app_name');
+
+if (app_name === null){
+  utils.getJSON('/config.json', function(data){
+    oauth_config.app_name = data.app_name;
+    localStorage.setItem('app_name', data.app_name);
+    oauth = ChromeExOAuth.initBackgroundPage(oauth_config);
+  });
+} else {
+  oauth_config.app_name = app_name;
+  oauth = ChromeExOAuth.initBackgroundPage(oauth_config);
 }
 
 function onAuthorized() {
-  var url = 'https://spreadsheets.google.com/feeds/default/private/full';
-  var request = {
-    'method': 'GET',
-    'parameters': {'alt': 'json'}
-  };
-
-  oauth.sendSignedRequest(url, callback, request);
+  console.log('authorized');
 }
 
 oauth.authorize(onAuthorized);
