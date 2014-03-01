@@ -37,7 +37,7 @@
       "all_frames": true,
       "js": ["js/contentscript.js"],
       "matches": ["*://*/*"],
-      "run_at": "document_start"
+      "run_at": "document_end"
     }
   ],
   "content_security_policy": "script-src 'self' https://spreadsheets.google.com; object-src 'self'",

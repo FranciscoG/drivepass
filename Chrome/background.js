@@ -33,3 +33,14 @@ oauth.authorize(onAuthorized);
 if (!localStorage['sheet_url']) {
   chrome.tabs.create({url: "options.html"});
 }
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  var _data = localStorage.getItem('_data');
+  if (_data !== null){
+    var tabUrl = utils.getHostname(sender.url);
+    var deets = DrivePass.Password.findPW(JSON.parse(_data),tabUrl);
+    sendResponse({username: deets[0], password: deets[1]});
+  } else {
+    sendResponse({data: null});
+  }
+});

@@ -19,45 +19,6 @@ DrivePass.Popup = (function() {
   var Sheet = new DrivePass.GoogleSpreadsheet();
   Sheet.init(DrivePass.Settings.gs_sheet_init);
 
- /**
-  * Searches through the spreadsheet data for the matching domain
-  * @param  {object}  data - json object
-  * @param  {string}  tabDomain
-  * @return {array}   [username,password]
-  */
-  var findPW = function(data,tabDomain) {
-    var _data = data || {};
-    if (Object.keys(_data).length) {
-      for (var prop in _data) {
-        if (tabDomain.indexOf(_data[prop].site) !== -1) {
-          var result = [];
-          result.push(_data[prop].username,_data[prop].password,_data[prop].site);
-          return result;
-        }
-      }
-    } else {
-      console.warn('findPW: data not an object');
-    }
-  };
-
-  var filterResults = function(response){
-    var data = response || {};
-    var _i = 0,
-        _results = {},
-        _entries = data.feed.entry,
-        cols = DrivePass.Settings.gs_sheet_init.columns;
-
-    for (var prop in _entries) {
-      _results[_i] = {};
-      for (var n=0; n < cols.length; n++){
-        var gsx = 'gsx$'+cols[n];
-        _results[_i][cols[n]] = _entries[prop][gsx].$t;
-      }
-      _i++;
-    }
-    return _results;
-  };
-
   /**
    * Updates the status element ID and displays it
    * @param  {string} status
@@ -155,7 +116,7 @@ DrivePass.Popup = (function() {
     TODO: check local storage option and either run below or do sheet.load with callback
     */
     activeUrl = DrivePass.Browser.activeTabUrl;
-    var found = findPW(filteredData,activeUrl);
+    var found = DrivePass.Password.findPW(filteredData,activeUrl);
     if (typeof found === 'undefined') {
       pwNotFound();
     } else {
@@ -167,7 +128,7 @@ DrivePass.Popup = (function() {
     Sheet.load(function(response_data){
       localStorage.setItem('_full', JSON.stringify(response_data));
       if (response_data.success === true) {
-        filteredData = filterResults(response_data.sheetData);
+        filteredData = DrivePass.Password.filterResults(response_data.sheetData);
         localStorage.setItem('_data', JSON.stringify(filteredData));
         if (typeof cb === "function") {
           cb();
