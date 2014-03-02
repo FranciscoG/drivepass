@@ -30,16 +30,17 @@ oauth.authorize(onAuthorized);
 /**
  * Shows the options page to the user if they haven't added their spreadsheet url yet
  */
-if (!localStorage['sheet_url']) {
+if (!localStorage['sheet_url'] || localStorage['sheet_url'] === "") {
   chrome.tabs.create({url: "options.html"});
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  var _data = localStorage.getItem('_data');
-  if (_data !== null){
-    var tabUrl = utils.getHostname(sender.url);
-    var deets = DrivePass.Password.findPW(JSON.parse(_data),tabUrl);
-    sendResponse({username: deets[0], password: deets[1]});
-    return true;
+  if (sender.url === sender.tab.url) {
+    var _data = localStorage.getItem('_data');
+    if (_data !== null){
+      var tabUrl = utils.getHostname(sender.url);
+      var deets = DrivePass.Password.findPW(JSON.parse(_data),tabUrl);
+      sendResponse({username: deets[0], password: deets[1], url:sender.url});
+    }
   }
 });

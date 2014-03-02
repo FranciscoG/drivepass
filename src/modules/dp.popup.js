@@ -117,7 +117,7 @@ DrivePass.Popup = (function() {
     */
     activeUrl = DrivePass.Browser.activeTabUrl;
     var found = DrivePass.Password.findPW(filteredData,activeUrl);
-    if (typeof found === 'undefined') {
+    if (found.length !== 3) {
       pwNotFound();
     } else {
       onSuccess(found);
@@ -138,16 +138,22 @@ DrivePass.Popup = (function() {
   };
 
   var init = function() {
-    if (filteredData === null) {
-      resetLocal(function(){
-        DrivePass.Browser.getActiveTab(initCb);
-      });
+    /**
+     * Shows the options page to the user if they haven't added their spreadsheet url yet
+     */
+    if (!localStorage['sheet_url'] || localStorage['sheet_url'] === "") {
+      handleStatus('error', "no spreadsheet set in options");
     } else {
-      DrivePass.Browser.getActiveTab(initCb);
+      if (filteredData === null) {
+        resetLocal(function(){
+          DrivePass.Browser.getActiveTab(initCb);
+        });
+      } else {
+        DrivePass.Browser.getActiveTab(initCb);
+      }
+      bindAdd();
+      bindUpdate();
     }
-
-    bindAdd();
-    bindUpdate();
   };
 
   return {

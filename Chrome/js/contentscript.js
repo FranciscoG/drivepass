@@ -55,28 +55,24 @@
       addBgImage(e);
     });
   };
-
+  
   // fill in username and pw on page load
   chrome.runtime.sendMessage({method: "getPW"}, function(response) {
-    if (response.data !== null) {
+    if (response.data !== null && typeof response.password !== "undefined") {
       filterInputs();
       insertDetails(response.username,response.password);
-      return true;
     }
   });
 
   // fill in username and pw from browser action
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log(true);
     if (typeof request.username !== 'undefined' && typeof request.password !== 'undefined'){
       during = "action";
       filterInputs();
       insertDetails(request.username,request.password);
       sendResponse({dom: "success"});
-      return true;
     } else {
       sendResponse({dom: "error"});
-      return true;
     }
   });
 

@@ -22,7 +22,7 @@ DrivePass.Password = {
       }
       return _result;
     } else {
-      console.warn('findPW: data not an object');
+      throw new Error('findPW: data not an object');
     }
   },
 
