@@ -14,16 +14,13 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "page": "background.html"
+    "page": "background.html",
+    "persistent": false
   },
   "options_page": "options.html",
   "permissions": [
     "activeTab",
     "tabs",
-    "idle",
-    "notifications",
-    "webRequest",
-    "webRequestBlocking",
     "http://*/*",
     "https://*/*"
   ],

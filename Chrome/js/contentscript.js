@@ -1,6 +1,18 @@
 (function(){
+  if (!chrome.runtime) {
+    // Chrome 20-21
+    chrome.runtime = chrome.extension;
+  } else if(!chrome.runtime.onMessage) {
+    // Chrome 22-25
+    chrome.runtime.onMessage = chrome.extension.onMessage;
+    chrome.runtime.sendMessage = chrome.extension.sendMessage;
+    chrome.runtime.onConnect = chrome.extension.onConnect;
+    chrome.runtime.connect = chrome.extension.connect;
+  }
 
   var focused,
+      possibleUn = [],
+      during = "load",
       passwordInput=[];
   
   var addBgImage = function(el){
@@ -13,23 +25,30 @@
   };
 
   // get all inputs
-  var nodes = document.getElementsByTagName('input');
-  
-  var filterInputs = function(nodes){
+  var filterInputs = function(){
+    var nodes = document.getElementsByTagName('input');
     // grab all inputs and find all that are type=password ot text
     for (var i=0;i<nodes.length;i++) {
       if (nodes[i].type === "password") {
         passwordInput.push(nodes[i]);
-      } else if (nodes[i].type === "text") {
+      } else if (nodes[i].type === "text" && during === "action") {
         nodes[i].addEventListener('focus',setFocused,false);
+      } else if (/signin|email|login|username/g.test(nodes[i].id) && during === "load") {
+        possibleUn.push(nodes[i]);
       }
     }
   };
-  filterInputs(nodes);
 
   var insertDetails = function(un,pw) {
-    if (un) {
-      document.getElementById(focused).value = un;
+    if (un && during === "action") {
+      var $un = document.getElementById(focused);
+      $un.value = un;
+      addBgImage($un);
+    } else if (un && during === "load") {
+      possibleUn.forEach(function(e){
+        e.value = un;
+        addBgImage(e);
+      });
     }
     passwordInput.forEach(function(e){
       e.value = pw;
@@ -40,18 +59,25 @@
   // fill in username and pw on page load
   chrome.runtime.sendMessage({method: "getPW"}, function(response) {
     if (response.data !== null) {
-      insertDetails(null,response.password);
+      filterInputs();
+      insertDetails(response.username,response.password);
+      return true;
     }
   });
 
   // fill in username and pw from browser action
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-   if (typeof request.username !== 'undefined' && typeof request.password !== 'undefined'){
+    console.log(true);
+    if (typeof request.username !== 'undefined' && typeof request.password !== 'undefined'){
+      during = "action";
+      filterInputs();
       insertDetails(request.username,request.password);
       sendResponse({dom: "success"});
-   } else {
+      return true;
+    } else {
       sendResponse({dom: "error"});
-   }
+      return true;
+    }
   });
 
 })();
