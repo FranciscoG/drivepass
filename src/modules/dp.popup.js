@@ -144,7 +144,7 @@ DrivePass.Popup = (function() {
     if (!localStorage['sheet_url'] || localStorage['sheet_url'] === "") {
       handleStatus('error', "no spreadsheet set in options");
     } else {
-      if (filteredData === null) {
+      if (filteredData === null || fullData === null) {
         resetLocal(function(){
           DrivePass.Browser.getActiveTab(initCb);
         });

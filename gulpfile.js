@@ -1,7 +1,6 @@
 var gulp = require('gulp'),
     gutil = require('gulp-util'),
     uglify = require('gulp-uglify'),
-    //changed = require('gulp-changed'),
     concat = require('gulp-concat'),
     jshint = require('gulp-jshint'),
     stylish = require('jshint-stylish'),
@@ -29,7 +28,7 @@ function moveStuff(cfg) {
     .pipe(gulp.dest(cfg.dest));
 }
 function exportTo(_dest){
-  moveStuff({src: "src/css/*", dest: _dest+"/css"});
+  moveStuff({src: "src/css/**", dest: _dest+"/css"});
   moveStuff({src: "src/build/*", dest: _dest+"/js"});
   moveStuff({src: "src/img/*", dest: _dest+"/img"});
 }
