@@ -35,7 +35,7 @@ if (!localStorage['sheet_url'] || localStorage['sheet_url'] === "") {
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (sender.url === sender.tab.url) {
+  if (sender.url === sender.tab.url && request.method === "getPW") {
     var _data = localStorage.getItem('_data');
     if (_data !== null){
       var tabUrl = utils.getHostname(sender.url);

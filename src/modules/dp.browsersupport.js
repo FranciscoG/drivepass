@@ -11,6 +11,21 @@ DrivePass.Browser = {
     return /Chrome/.test(navigator.userAgent);
   },
   
+  ChromeExt: function(){
+    if (this.isChrome()){
+      if (!chrome.runtime) {
+        // Chrome 20-21
+        chrome.runtime = chrome.extension;
+      } else if(!chrome.runtime.onMessage) {
+        // Chrome 22-25
+        chrome.runtime.onMessage = chrome.extension.onMessage;
+        chrome.runtime.sendMessage = chrome.extension.sendMessage;
+        chrome.runtime.onConnect = chrome.extension.onConnect;
+        chrome.runtime.connect = chrome.extension.connect;
+      }
+    }
+  },
+  
   isFirefox : function(){
     return /Firefox/.test(navigator.userAgent);
   },
@@ -61,7 +76,7 @@ DrivePass.Browser = {
   oAuthSendRequest : function(listUrl, callback, params) {
 
     if (this.isChrome()) {
-
+      this.ChromeExt();
       chrome.runtime.getBackgroundPage(function(w){
         w.oauth.sendSignedRequest(listUrl, callback, params);
       });
