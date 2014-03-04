@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/FranciscoG/password-manager-extension">
-    <img height="128" width="128" src="https://raw.github.com/FranciscoG/password-manager-extension/trying-gulp/src/img/drive-pass128.png"/>
+    <img height="128" width="128" src="https://raw.github.com/FranciscoG/drivepass/master/src/img/drive-pass128.png"/>
   </a>
 </p>
 
