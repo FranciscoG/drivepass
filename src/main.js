@@ -34,38 +34,7 @@ DrivePass.ext = new DrivePass.Router({
   },
 
   chrome_options : function() {
-    var Sheet = new DrivePass.GoogleSpreadsheet();
-    utils.toggler('inst_link','instructions');
-    // Saves options to localStorage.cc
-    function save_options() {
-      var sheet_url_val = document.getElementById("sheet_url").value;
-      localStorage.setItem("sheet_url", sheet_url_val);
-      DrivePass.Settings.gs_sheet_init.sheet_url = sheet_url_val;
-      Sheet.init(DrivePass.Settings.gs_sheet_init);
-      // load data into locatStorage upon saving
-      DrivePass.Signal.listen('gs_data_loaded', function(topic,response_data){
-        localStorage.setItem('_data', JSON.stringify(response_data));
-      });
-      Sheet.load();
-      // Update status to let user know options were saved.
-      document.getElementById("status").textContent = "Options Saved.";
-    }
-
-    // Populates the input box with the saved url if it exists
-    function restore_options() {
-      var curr_url = localStorage.getItem("sheet_url");
-      if (curr_url === null || curr_url === "") {
-        return false;
-      } else {
-        document.getElementById("sheet_url").value = curr_url;
-        document.getElementById("save").textContent = "update";
-        var sheetJump = document.getElementById("goToSheet");
-        sheetJump.href = curr_url;
-        sheetJump.style.display = "block";
-      }
-    }
-    document.addEventListener('DOMContentLoaded', restore_options);
-    document.getElementById('save').addEventListener('click', save_options);
+    new DrivePass.Options();
   }
 
 });

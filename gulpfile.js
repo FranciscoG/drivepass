@@ -4,7 +4,8 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     jshint = require('gulp-jshint'),
     stylish = require('jshint-stylish'),
-    streamqueue = require('streamqueue');
+    streamqueue = require('streamqueue'),
+    open = require('gulp-open');
 
 var libs = "src/libs/*.js";
 var modules = "src/modules/*.js";
@@ -63,11 +64,32 @@ gulp.task('export', ['uglify'], function() {
   return console.log(timestamp());
 });
 
+gulp.task("reload_chrome_extension", function(){
+  var options = {
+    url: "http://reload.extensions",
+    app: "google-chrome"
+  };
+  gulp.src("./index.html")
+  .pipe(open("", options));
+  return console.log(timestamp());
+});
+// A file must be specified as the src when running options.url or gulp will overlook the task.
+
+
 gulp.task('watch', ['export'], function(){
   gulp.watch(modules, ['export']);
   gulp.watch(main, ['export']);
   gulp.watch('src/css/*.css', ['export']);
   gulp.watch('src/img/**', ['export']);
+});
+
+gulp.task('watch_chrome', ['export'], function(){
+  gulp.watch(modules, ['export', "reload_chrome_extension"]);
+  gulp.watch(main, ['export', "reload_chrome_extension"]);
+  gulp.watch('Chrome/background.js', ["reload_chrome_extension"]);
+  gulp.watch('Chrome/js/contentscript.js', ["reload_chrome_extension"]);
+  gulp.watch('src/css/*.css', ['export', "reload_chrome_extension"]);
+  gulp.watch('src/img/**', ['export', "reload_chrome_extension"]);
 });
 
 gulp.task('default', ['export']);

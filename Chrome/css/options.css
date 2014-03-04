@@ -1,5 +1,5 @@
 
-#sheet_url {
+input[type="text"] {
   width: 100%;
   box-sizing:border-box;
   height:30px;

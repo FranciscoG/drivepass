@@ -8,24 +8,22 @@ oauth_config = {
   'scope': 'https://spreadsheets.google.com/feeds/'
 };
 
-var app_name = localStorage.getItem('app_name');
-
-if (app_name === null){
-  utils.getJSON('/config.json', function(data){
-    oauth_config.app_name = data.app_name;
-    localStorage.setItem('app_name', data.app_name);
-    oauth = ChromeExOAuth.initBackgroundPage(oauth_config);
-  });
-} else {
-  oauth_config.app_name = app_name;
-  oauth = ChromeExOAuth.initBackgroundPage(oauth_config);
-}
-
+/*
+ * Chrome Extension oAuth source: http://developer.chrome.com/extensions/tut_oauth
+ */
 function onAuthorized() {
   console.log('authorized');
 }
 
-oauth.authorize(onAuthorized);
+var app_name = localStorage.getItem('app_name');
+
+if (app_name === null || app_name === "") {
+  chrome.tabs.create({url: "options.html"});
+} else {
+  oauth_config.app_name = "DrivePass Chrome Extension - " + app_name;
+  oauth = ChromeExOAuth.initBackgroundPage(oauth_config);
+  oauth.authorize(onAuthorized);
+}
 
 /**
  * Shows the options page to the user if they haven't added their spreadsheet url yet
