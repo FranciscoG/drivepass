@@ -5,8 +5,12 @@ oauth_config = {
   'access_url': 'https://www.google.com/accounts/OAuthGetAccessToken',
   'consumer_key': 'anonymous',
   'consumer_secret': 'anonymous',
-  'scope': 'https://spreadsheets.google.com/feeds/'
+  'scope': 'https://spreadsheets.google.com/feeds/ https://www.googleapis.com/auth/drive'
 };
+/*
+  Google Drive api info for inserting new doc
+  https://developers.google.com/drive/v2/reference/files/insert
+ */
 
 /*
  * Chrome Extension oAuth source: http://developer.chrome.com/extensions/tut_oauth

@@ -13,6 +13,7 @@ DrivePass.Options = (function() {
     $setAppName = document.getElementById('setAppName'),
     $save = document.getElementById('save'),
     $sheetJump = document.getElementById("goToSheet"),
+    $makeSheet = document.getElementById('makeSheet'),
     doReload = false;
     
     utils.toggler('inst_link','instructions');
@@ -61,6 +62,13 @@ DrivePass.Options = (function() {
       }
     }
     document.addEventListener('DOMContentLoaded', restore_options);
-    document.getElementById('save').addEventListener('click', save_options);
+    $save.addEventListener('click', save_options);
+
+    var gdrive = new DrivePass.GoogleDrive();
+    
+    $makeSheet.addEventListener('click', function(e){
+      e.preventDefault();
+
+    });
 
 });
