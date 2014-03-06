@@ -65,9 +65,10 @@ DrivePass.Options = (function() {
     $save.addEventListener('click', save_options);
 
     var gdrive = new DrivePass.GoogleDrive();
-    
+
     $makeSheet.addEventListener('click', function(e){
       e.preventDefault();
+      DrivePass.GoogleDrive().init();
 
     });
 
