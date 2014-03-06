@@ -33,7 +33,7 @@
         passwordInput.push(nodes[i]);
       } else if (nodes[i].type === "text" && during === "action") {
         nodes[i].addEventListener('focus',setFocused,false);
-      } else if (/signin|email|login|username/g.test(nodes[i].id) && during === "load") {
+      } else if (/signin|email|login|username/gi.test(nodes[i].id) && during === "load") {
         possibleUn.push(nodes[i]);
       }
     }
