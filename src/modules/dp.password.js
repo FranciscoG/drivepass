@@ -14,9 +14,9 @@ DrivePass.Password = {
   findPW : function(data,tabDomain) {
     var _data = data || {},
         _result = [];
-    if (Object.keys(_data).length) {
+    if (_.keys(_data).length > 0) {
       for (var prop in _data) {
-        if (tabDomain.indexOf(_data[prop].site) !== -1) {
+        if (tabDomain.indexOf(_data[prop].site.trim()) !== -1) {
           _result.push(_data[prop].username,_data[prop].password,_data[prop].site);
         }
       }

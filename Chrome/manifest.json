@@ -22,7 +22,8 @@
     "activeTab",
     "tabs",
     "http://*/*",
-    "https://*/*"
+    "https://*/*",
+    "contextMenus"
   ],
   "requirements": {
       "plugins": {

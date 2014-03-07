@@ -5,12 +5,8 @@ oauth_config = {
   'access_url': 'https://www.google.com/accounts/OAuthGetAccessToken',
   'consumer_key': 'anonymous',
   'consumer_secret': 'anonymous',
-  'scope': 'https://spreadsheets.google.com/feeds/ https://www.googleapis.com/auth/drive'
+  'scope': 'https://spreadsheets.google.com/feeds/'
 };
-/*
-  Google Drive api info for inserting new doc
-  https://developers.google.com/drive/v2/reference/files/insert
- */
 
 /*
  * Chrome Extension oAuth source: http://developer.chrome.com/extensions/tut_oauth
@@ -46,3 +42,23 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
   }
 });
+
+/*
+ * setting up the right-click menu item
+ */
+
+function contextMenusOnclick(){
+  console.log('reseting local cache');
+  DrivePass.Popup().resetLocal();
+}
+
+chrome.contextMenus.create({
+  "title": "refresh local data",
+  "contexts": ["all"],
+  "id" : "999"
+}, function(){
+  if (chrome.extension.lastError) {
+    console.log("contextmenu error: " + chrome.extension.lastError.message);
+  }
+});
+chrome.contextMenus.onClicked.addListener(contextMenusOnclick);

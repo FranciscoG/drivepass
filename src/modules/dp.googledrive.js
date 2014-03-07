@@ -1,3 +1,9 @@
+/*
+  I wanted to be able ot upload a blank spreadsheet for the user but that involves way more
+  access and the use of the Google Drive SDK.  I'm going to leave this here but unused for now.
+  I'd rather the user just create a spreadsheet themselves rather than create it for them.
+ */
+
 var DrivePass = DrivePass || {};
 
 DrivePass.GoogleDrive = (function(){

@@ -157,6 +157,7 @@ DrivePass.Popup = (function() {
   };
 
   return {
-    init: init
+    init: init,
+    resetLocal: resetLocal
   };
 });
