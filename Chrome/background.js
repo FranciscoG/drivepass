@@ -49,7 +49,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 function contextMenusOnclick(){
   console.log('reseting local cache');
-  DrivePass.Popup().resetLocal();
+  DrivePass.ResetLocal().init();
 }
 
 chrome.contextMenus.create({
