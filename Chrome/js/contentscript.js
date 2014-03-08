@@ -33,7 +33,12 @@
         passwordInput.push(nodes[i]);
       } else if (nodes[i].type === "text" && during === "action") {
         nodes[i].addEventListener('focus',setFocused,false);
-      } else if (/signin|email|login|username/gi.test(nodes[i].id) && during === "load" && nodes[i].type !== "submit") {
+      } else if (
+        /signin|email|login|username/gi.test(nodes[i].id) 
+        && during === "load" 
+        && nodes[i].type !== "submit"
+        && !nodes[i].disabled
+      ) {
         possibleUn.push(nodes[i]);
       }
     }

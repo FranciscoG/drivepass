@@ -34,6 +34,7 @@ Run Gulp Watch while developing to automatically jshint, concat, uglify, and cop
 gulp watch
 ```
 
+I started off with Grunt and the Gruntfile is still there and operational, but I'm going to stop supporting it so if you want to use Grunt and you start to get errors you might need to tweak it.  If I deviate far enough I'll just remove it completely.
 
 **TODO:**
 
@@ -48,8 +49,6 @@ gulp watch
 * create a new spreadsheet if none exists
 
 * viewing passwords locally
-
-* better integration with sites inputs
 
 * way down the line, possible FireFox version
 
