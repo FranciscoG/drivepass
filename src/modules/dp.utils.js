@@ -43,6 +43,10 @@ var utils = {
     }
   },
 
+  encodeHTML: function(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  },
+
   addslashes: function( str ) {
     return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
   },

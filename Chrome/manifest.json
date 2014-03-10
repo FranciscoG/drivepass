@@ -34,11 +34,13 @@
     {
       "all_frames": true,
       "js": ["js/contentscript.js"],
-      "matches": ["*://*/*"],
+      "matches": ["http://*/*", "https://*/*"],
       "run_at": "document_end"
     }
   ],
-  "content_security_policy": "script-src 'self' https://spreadsheets.google.com; object-src 'self'",
+  // http://developer.chrome.com/extensions/contentSecurityPolicy
+  // http://www.html5rocks.com/en/tutorials/security/content-security-policy/
+  "content_security_policy": "default-src 'none'; script-src 'self' https://spreadsheets.google.com; connect-src https://spreadsheets.google.com; img-src 'self'; style-src 'self'",
   "web_accessible_resources":[
     "chrome_ex_oauth.html"
   ]

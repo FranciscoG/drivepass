@@ -41,9 +41,9 @@ DrivePass.Popup = (function() {
   var onSuccess = function(result){
     $loading.style.display = "none";
     handleStatus('success','password found');
-    $un.textContent = result[0];
-    $pw.textContent = result[1];
-    $hiddenSite.value = result[2];
+    $un.textContent = utils.encodeHTML(result[0]);
+    $pw.textContent = utils.encodeHTML(result[1]);
+    $hiddenSite.value = utils.encodeHTML(result[2]);
     
     DrivePass.Browser.sendToPage({username: result[0], password: result[1]});
     

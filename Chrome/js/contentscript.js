@@ -44,19 +44,23 @@
     }
   };
 
+  var encodeHTML = function(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  };
+
   var insertDetails = function(un,pw) {
     if (un && during === "action") {
       var $un = document.getElementById(focused);
-      $un.value = un;
+      $un.value = encodeHTML(un);
       addBgImage($un);
     } else if (un && during === "load") {
       possibleUn.forEach(function(e){
-        e.value = un;
+        e.value = encodeHTML(un);
         addBgImage(e);
       });
     }
     passwordInput.forEach(function(e){
-      e.value = pw;
+      e.value = encodeHTML(pw);
       addBgImage(e);
     });
   };
