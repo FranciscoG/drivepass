@@ -148,6 +148,42 @@ DrivePass.GoogleSpreadsheet = (function(){
     return _response;
   };
 
+  var processQeury = function(response,xhr) {
+    if (xhr.status !== 200) {
+      _response = {success:false, message: xhr.status + ": error querying"};
+      console.warn(xhr);
+    } else {
+      _response = {success:true, message: 'query successful'};
+      _response.queryData = JSON.parse(response);
+    }
+    DrivePass.Signal.broadcast('gs_data_query', _response);
+
+    if (_options.cb !== null) {
+      _options.cb(_response);
+    }
+    return _response;
+  };
+
+  // https://developers.google.com/google-apps/spreadsheets/#sending_a_structured_query_for_rows
+  /**
+   * Simple query to the Spreadsheet DB that looks for data in column and returns row
+   * @param  {string}   col  the column name
+   * @param  {string}   data the item to be matched
+   * @param  {function} cb   callback function
+   */
+  var query = function(col,data,cb){
+    var q = col +'=' + data;
+    _options.cb = (typeof cb === "function") ? cb : null;
+    var params = {
+      'method': 'GET',
+      'parameters': {
+        'alt': 'json',
+        'sq' : q.replace(' ', '%20')
+      }
+    };
+    DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl, processQeury, params);
+  };
+
   /*
     example usage and required parameters
     var spreadsheet = Googlespreadsheet.init({
@@ -189,7 +225,8 @@ DrivePass.GoogleSpreadsheet = (function(){
     init:init,
     load:load,
     add:add,
-    update:update
+    update:update,
+    query:query
   };
 
 });

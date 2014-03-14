@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "Drive Pass",
+  "name": "DrivePass",
   "description": "This extension fetches a password from a google spreadsheet using oAuth and the Google Drive api",
   "icons": { 
     "16": "img/drive-pass16.png",

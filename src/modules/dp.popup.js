@@ -116,6 +116,11 @@ DrivePass.Popup = (function() {
     TODO: check local storage option and either run below or do sheet.load with callback
     */
     activeUrl = DrivePass.Browser.activeTabUrl;
+    
+    Sheet.query('site',activeUrl, function(r){
+      var qdata = DrivePass.Password.filterResults(r.queryData);
+      console.log(qdata);
+    });
     var found = DrivePass.Password.findPW(filteredData,activeUrl);
     if (found.length !== 3) {
       pwNotFound();
