@@ -36,8 +36,9 @@
       } else if (
         /signin|email|login|username/gi.test(nodes[i].id) 
         && during === "load" 
-        && nodes[i].type !== "submit"
+        && nodes[i].type === "text"
         && !nodes[i].disabled
+        && nodes[i].style.display !== 'none'
       ) {
         possibleUn.push(nodes[i]);
       }

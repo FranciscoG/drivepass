@@ -5,16 +5,16 @@ DrivePass.Popup = (function() {
   // caching DOM elements
   // I'm not using jQuery so the $ represents element IDs only
   var $loading = document.getElementById('loading'),
-      $status = document.getElementById('status'),
-      $un = document.getElementById('un'),
-      $pw = document.getElementById('pw'),
-      $add = document.getElementById('add'),
-      $update = document.getElementById('update'),
-      $theInfo = document.getElementById('theInfo'),
-      $hiddenSite = document.getElementById('hdnSite'),
-      filteredData = JSON.parse(localStorage.getItem('_data')),
-      fullData = JSON.parse(localStorage.getItem('_full')),
-      activeUrl;
+    $status = document.getElementById('status'),
+    $un = document.getElementById('un'),
+    $pw = document.getElementById('pw'),
+    $add = document.getElementById('add'),
+    $update = document.getElementById('update'),
+    $theInfo = document.getElementById('theInfo'),
+    $hiddenSite = document.getElementById('hdnSite'),
+    filteredData = JSON.parse(localStorage.getItem('_data')),
+    fullData = JSON.parse(localStorage.getItem('_full')),
+    activeUrl;
 
   var Sheet = new DrivePass.GoogleSpreadsheet();
   Sheet.init(DrivePass.Settings.gs_sheet_init);
@@ -24,7 +24,7 @@ DrivePass.Popup = (function() {
    * @param  {string} status
    * @param  {string} message
    */
-  var handleStatus = function(status,message) {
+  var handleStatus = function(status, message) {
     var stat = status || '';
     var msg = message || '';
     if (stat !== '' && msg !== '') {
@@ -38,15 +38,18 @@ DrivePass.Popup = (function() {
    * run on successful load of google spreadsheet
    * @param  {object} result  - json object
    */
-  var onSuccess = function(result){
+  var onSuccess = function(result) {
     $loading.style.display = "none";
-    handleStatus('success','password found');
+    handleStatus('success', 'password found');
     $un.textContent = utils.encodeHTML(result[0]);
     $pw.textContent = utils.encodeHTML(result[1]);
     $hiddenSite.value = utils.encodeHTML(result[2]);
-    
-    DrivePass.Browser.sendToPage({username: result[0], password: result[1]});
-    
+
+    DrivePass.Browser.sendToPage({
+      username: result[0],
+      password: result[1]
+    });
+
     $add.classList.remove('show');
     $update.classList.add('show');
   };
@@ -54,41 +57,41 @@ DrivePass.Popup = (function() {
   /**
    * handle UI updates when password not found
    */
-  var pwNotFound = function(){
+  var pwNotFound = function() {
     $loading.style.display = "none";
-    handleStatus('error','password not found');
+    handleStatus('error', 'password not found');
     utils.toggle($theInfo);
   };
 
   /**
    * bind the event listener that handles adding a new entry into the google spreadheet
    */
-  var bindAdd = function(){
+  var bindAdd = function() {
     $add.addEventListener('click', function(evt) {
       var un = document.getElementById('un').textContent;
       var pw = document.getElementById('pw').textContent;
-      var data = [activeUrl,un,pw];
-      Sheet.add(data,function(result){
-        if (result.success === false){
-          handleStatus('error',result.message);
+      var data = [activeUrl, un, pw];
+      Sheet.add(data, function(result) {
+        if (result.success === false) {
+          handleStatus('error', result.message);
         } else {
           handleStatus('success', result.message);
           resetLocal();
         }
       });
-    },false);
+    }, false);
   };
 
-  var bindUpdate = function(){
-    $update.addEventListener('click', function(evt){
+  var bindUpdate = function() {
+    $update.addEventListener('click', function(evt) {
       var _site = $hiddenSite.value;
       var entry = findEntry(_site);
       var un = document.getElementById('un').textContent;
       var pw = document.getElementById('pw').textContent;
-      var data = [_site,un,pw];
-      Sheet.update(entry,data,function(result){
-        if (result.success === false){
-          handleStatus('error',result.message);
+      var data = [_site, un, pw];
+      Sheet.update(entry, data, function(result) {
+        if (result.success === false) {
+          handleStatus('error', result.message);
         } else {
           handleStatus('success', result.message);
           resetLocal(); // reload sheet after update
@@ -102,26 +105,21 @@ DrivePass.Popup = (function() {
    * @param  {string} site      the website that you're trying to change data for
    * @return {string}           the object key
    */
-  var findEntry = function(site){
+  var findEntry = function(site) {
     var _fullSheet = fullData.sheetData;
-    for (var entry in _fullSheet.feed.entry) { 
-      if (_fullSheet.feed.entry[entry].gsx$site.$t === site){
+    for (var entry in _fullSheet.feed.entry) {
+      if (_fullSheet.feed.entry[entry].gsx$site.$t === site) {
         return _fullSheet.feed.entry[entry];
       }
     }
   };
 
-  var initCb = function(){
+  var initCb = function() {
     /*
     TODO: check local storage option and either run below or do sheet.load with callback
     */
-    activeUrl = DrivePass.Browser.activeTabUrl;
-    
-    Sheet.query('site',activeUrl, function(r){
-      var qdata = DrivePass.Password.filterResults(r.queryData);
-      console.log(qdata);
-    });
-    var found = DrivePass.Password.findPW(filteredData,activeUrl);
+    activeUrl = DrivePass.Browser.activeTabUrl.replace('www.', "");
+    var found = DrivePass.Password.findPW(filteredData, activeUrl);
     if (found.length !== 3) {
       pwNotFound();
     } else {
@@ -129,8 +127,8 @@ DrivePass.Popup = (function() {
     }
   };
 
-  var resetLocal = function(cb){
-    Sheet.load(function(response_data){
+  var resetLocal = function(cb) {
+    Sheet.load(function(response_data) {
       localStorage.setItem('_full', JSON.stringify(response_data));
       if (response_data.success === true) {
         filteredData = DrivePass.Password.filterResults(response_data.sheetData);
@@ -150,7 +148,7 @@ DrivePass.Popup = (function() {
       handleStatus('error', "no spreadsheet set in options");
     } else {
       if (filteredData === null || fullData === null) {
-        resetLocal(function(){
+        resetLocal(function() {
           DrivePass.Browser.getActiveTab(initCb);
         });
       } else {

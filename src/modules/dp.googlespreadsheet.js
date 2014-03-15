@@ -171,7 +171,7 @@ DrivePass.GoogleSpreadsheet = (function(){
    * @param  {string}   data the item to be matched
    * @param  {function} cb   callback function
    */
-  var query = function(col,data,cb){
+  var query = function(col, data, cb) {
     var q = col +'=' + data;
     _options.cb = (typeof cb === "function") ? cb : null;
     var params = {
