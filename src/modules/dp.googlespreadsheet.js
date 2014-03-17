@@ -1,16 +1,22 @@
 var DrivePass = DrivePass || {};
 
-DrivePass.GoogleSpreadsheet = (function(){
+DrivePass.GoogleSpreadsheet = (function() {
 
   var _options = {},
-      _response;
+    _response;
 
-  var processLoad = function(response,xhr){
+  var processLoad = function(response, xhr) {
     if (xhr.status !== 200) {
-      _response = {success:false, message: xhr.status + ": Connection Failed"};
+      _response = {
+        success: false,
+        message: xhr.status + ": Connection Failed"
+      };
       console.warn(xhr);
     } else {
-      _response = {success:true, message: 'spreadsheet successfully loaded'};
+      _response = {
+        success: true,
+        message: 'spreadsheet successfully loaded'
+      };
       _response.sheetData = JSON.parse(response);
     }
     DrivePass.Signal.broadcast('gs_data_loaded', _response);
@@ -36,11 +42,11 @@ DrivePass.GoogleSpreadsheet = (function(){
   };
 
   /**
-   * add new information to the spreadsheet. 
+   * add new information to the spreadsheet.
    * @param {array}    data array of data to be saved.  Make sure the order of the info inside the array matches the column order from init
    * @param {Function} cb   callback function
    */
-  var add = function(data,cb){
+  var add = function(data, cb) {
     _options.cb = (typeof cb === "function") ? cb : null;
     var params = {
       'method': 'POST',
@@ -62,8 +68,8 @@ DrivePass.GoogleSpreadsheet = (function(){
     var atomXML = '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">\n';
 
     var cols = _options.columns;
-    for (var i=0; i < cols.length; i++){
-      atomXML += '<gsx:' + cols[i] + '>' + data[i] + '</gsx:' + cols[i] +'>\n';
+    for (var i = 0; i < cols.length; i++) {
+      atomXML += '<gsx:' + cols[i] + '>' + data[i] + '</gsx:' + cols[i] + '>\n';
     }
     atomXML += '</entry>';
     return atomXML;
@@ -86,44 +92,50 @@ DrivePass.GoogleSpreadsheet = (function(){
     <gsx:password>test</gsx:password>
     </entry>
  */
-  var constructUpdateSpreadAtomXml_ = function(entry,data) {
+  var constructUpdateSpreadAtomXml_ = function(entry, data) {
     var atomXML = "<entry xmlns='http://www.w3.org/2005/Atom' xmlns:gsx='http://schemas.google.com/spreadsheets/2006/extended' ";
-    atomXML += "xmlns:gd='http://schemas.google.com/g/2005' gd:etag='"+ entry.gd$etag +"'>\n";
+    atomXML += "xmlns:gd='http://schemas.google.com/g/2005' gd:etag='" + entry.gd$etag + "'>\n";
     atomXML += '<id>' + entry.id.$t + '</id>\n';
     atomXML += '<updated>' + entry.updated.$t + '</updated>\n';
     atomXML += '<category scheme="http://schemas.google.com/spreadsheets/2006" term="http://schemas.google.com/spreadsheets/2006#list"/>\n';
     atomXML += "<title type='text'>" + entry.title.$t + "</title>\n";
-    atomXML +=  "<content type='text'>"+ entry.content.$t +"</content>\n";
-    atomXML += '<link rel="self" type="application/atom+xml" href="'+entry.link[0].href+'"/>\n';
-    atomXML += '<link rel="edit" type="application/atom+xml" href="'+entry.link[1].href+'"/>\n';
+    atomXML += "<content type='text'>" + entry.content.$t + "</content>\n";
+    atomXML += '<link rel="self" type="application/atom+xml" href="' + entry.link[0].href + '"/>\n';
+    atomXML += '<link rel="edit" type="application/atom+xml" href="' + entry.link[1].href + '"/>\n';
     var cols = _options.columns;
-    for (var i=0; i < cols.length; i++){
-      atomXML += '<gsx:' + cols[i] + '>' + data[i] + '</gsx:' + cols[i] +'>\n';
+    for (var i = 0; i < cols.length; i++) {
+      atomXML += '<gsx:' + cols[i] + '>' + data[i] + '</gsx:' + cols[i] + '>\n';
     }
     atomXML += '</entry>';
     return atomXML;
   };
 
-  var update = function(entry,data,cb){
+  var update = function(entry, data, cb) {
     _options.cb = (typeof cb === "function") ? cb : null;
     var params = {
       'method': 'PUT',
       'headers': {
         'GData-Version': '3.0',
         'Content-Type': 'application/atom+xml',
-        'if-match' : '*'
+        'if-match': '*'
       },
-      'body': constructUpdateSpreadAtomXml_(entry,data)
+      'body': constructUpdateSpreadAtomXml_(entry, data)
     };
     DrivePass.Browser.oAuthSendRequest(entry.link[1].href, processUpdate, params);
   };
 
-  var processAdd = function(response,xhr){
+  var processAdd = function(response, xhr) {
     if (xhr.status !== 201) {
-      _response = {success:false, message: xhr.status + ": error saving"};
+      _response = {
+        success: false,
+        message: xhr.status + ": error saving"
+      };
       console.warn(xhr);
     } else {
-      _response = {success:true, message: 'saved successfully'};
+      _response = {
+        success: true,
+        message: 'saved successfully'
+      };
     }
     DrivePass.Signal.broadcast('gs_data_added', _response);
 
@@ -133,12 +145,18 @@ DrivePass.GoogleSpreadsheet = (function(){
     return _response;
   };
 
-  var processUpdate = function(response,xhr){
+  var processUpdate = function(response, xhr) {
     if (xhr.status !== 200) {
-      _response = {success:false, message: xhr.status + ": error updating"};
+      _response = {
+        success: false,
+        message: xhr.status + ": error updating"
+      };
       console.warn(xhr);
     } else {
-      _response = {success:true, message: 'update successful'};
+      _response = {
+        success: true,
+        message: 'update successful'
+      };
     }
     DrivePass.Signal.broadcast('gs_data_updated', _response);
 
@@ -148,12 +166,18 @@ DrivePass.GoogleSpreadsheet = (function(){
     return _response;
   };
 
-  var processQeury = function(response,xhr) {
+  var processQeury = function(response, xhr) {
     if (xhr.status !== 200) {
-      _response = {success:false, message: xhr.status + ": error querying"};
+      _response = {
+        success: false,
+        message: xhr.status + ": error querying"
+      };
       console.warn(xhr);
     } else {
-      _response = {success:true, message: 'query successful'};
+      _response = {
+        success: true,
+        message: 'query successful'
+      };
       _response.queryData = JSON.parse(response);
     }
     DrivePass.Signal.broadcast('gs_data_query', _response);
@@ -172,13 +196,13 @@ DrivePass.GoogleSpreadsheet = (function(){
    * @param  {function} cb   callback function
    */
   var query = function(col, data, cb) {
-    var q = col +'=' + data;
+    var q = col + '=' + data;
     _options.cb = (typeof cb === "function") ? cb : null;
     var params = {
       'method': 'GET',
       'parameters': {
         'alt': 'json',
-        'sq' : q.replace(' ', '%20')
+        'sq': q.replace(' ', '%20')
       }
     };
     DrivePass.Browser.oAuthSendRequest(_options.jsonListUrl, processQeury, params);
@@ -204,8 +228,8 @@ DrivePass.GoogleSpreadsheet = (function(){
     }
 
     var url,
-        key,
-        sourceIdentifier = _options.sheet_url;
+      key,
+      sourceIdentifier = _options.sheet_url;
     if (sourceIdentifier.match(/http(s)*:/)) {
       url = sourceIdentifier;
       try {
@@ -222,11 +246,11 @@ DrivePass.GoogleSpreadsheet = (function(){
   };
 
   return {
-    init:init,
-    load:load,
-    add:add,
-    update:update,
-    query:query
+    init: init,
+    load: load,
+    add: add,
+    update: update,
+    query: query
   };
 
 });

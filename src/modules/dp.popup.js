@@ -115,9 +115,6 @@ DrivePass.Popup = (function() {
   };
 
   var initCb = function() {
-    /*
-    TODO: check local storage option and either run below or do sheet.load with callback
-    */
     activeUrl = DrivePass.Browser.activeTabUrl.replace('www.', "");
     var found = DrivePass.Password.findPW(filteredData, activeUrl);
     if (found.length !== 3) {
