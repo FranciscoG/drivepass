@@ -66,7 +66,7 @@ function contextMenusOnclick(arg1, arg2) {
       chrome.tabs.create({
         url: localStorage['sheet_url']
       });
-      break
+      break;
   }
 }
 
