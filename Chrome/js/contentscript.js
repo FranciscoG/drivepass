@@ -27,6 +27,8 @@
     }
   };
 
+  /* Not sure if I'm going to use this in the end, might not be necessary
+ 
   // Get input IDs on a form submit
   var bindIDgetter = function(elm) {
     elm.addEventListener('click', function(e) {
@@ -52,6 +54,7 @@
       bindIDgetter(forms[n]);
     }
   }
+  */
 
   // get all inputs
   var filterInputs = function() {
