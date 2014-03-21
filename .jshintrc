@@ -15,6 +15,7 @@
     "DrivePass" : true,
     "chrome" : true,
     "utils" : true,
-    "_" : true
+    "_" : true,
+    "TAFFY" : true
   }
 }

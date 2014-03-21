@@ -6,10 +6,14 @@ DrivePass.ext = new DrivePass.Router({
     DrivePass.Settings = JSON.parse(localStorage.getItem('options')) || {};
     DrivePass.Settings.keeplocal = DrivePass.Settings.keeplocal || true;
     DrivePass.Settings.route = document.body.dataset.route;
+
     DrivePass.Settings.gs_sheet_init = {
       sheet_url: localStorage.getItem('sheet_url'),
       columns: ['site', 'username', 'password']
     };
+
+    DrivePass.DB = TAFFY([JSON.parse(localStorage.getItem('_data'))]);
+    console.log(DrivePass.DB());
   },
 
   popup: function() {
