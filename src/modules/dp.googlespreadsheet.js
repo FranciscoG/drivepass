@@ -19,7 +19,7 @@ DrivePass.GoogleSpreadsheet = (function() {
       };
       _response.sheetData = JSON.parse(response);
     }
-    DrivePass.Signal.broadcast('gs_data_loaded', _response);
+    //DrivePass.Signal.broadcast('gs_data_loaded', _response);
 
     if (_options.cb !== null) {
       _options.cb(_response);
@@ -77,20 +77,6 @@ DrivePass.GoogleSpreadsheet = (function() {
 
   /*
     https://developers.google.com/google-apps/spreadsheets/?hl=fr-FR#updating_a_list_row
-    
-    example entry:
-    <entry xmlns='http://www.w3.org/2005/Atom' xmlns:gsx='http://schemas.google.com/spreadsheets/2006/extended'>  
-    <id>https://spreadsheets.google.com/feeds/list/0AutNQyCIKVnndDB3WUFKRmZ6Y1BlRXcxY0p5VDlUbGc/od6/private/full/agihe</id>
-    <updated>2014-02-25T05:51:56.809Z</updated>
-    <category scheme='http://schemas.google.com/spreadsheets/2006' term='http://schemas.google.com/spreadsheets/2006#list'/>
-    <title type='text'>test_test</title>
-    <content type='text'>username: test, password: test</content> 
-    <link rel='self' type='application/atom+xml' href='https://spreadsheets.google.com/feeds/list/0AutNQyCIKVnndDB3WUFKRmZ6Y1BlRXcxY0p5VDlUbGc/od6/private/full/agihe'/>
-    <link rel='edit' type='application/atom+xml' href='https://spreadsheets.google.com/feeds/list/0AutNQyCIKVnndDB3WUFKRmZ6Y1BlRXcxY0p5VDlUbGc/od6/private/full/agihe/gglbng5oc977'/> 
-    <gsx:site>test_test</gsx:site>
-    <gsx:username>test</gsx:username>
-    <gsx:password>test</gsx:password>
-    </entry>
  */
   var constructUpdateSpreadAtomXml_ = function(entry, data) {
     var atomXML = "<entry xmlns='http://www.w3.org/2005/Atom' xmlns:gsx='http://schemas.google.com/spreadsheets/2006/extended' ";
@@ -137,7 +123,7 @@ DrivePass.GoogleSpreadsheet = (function() {
         message: 'saved successfully'
       };
     }
-    DrivePass.Signal.broadcast('gs_data_added', _response);
+    //DrivePass.Signal.broadcast('gs_data_added', _response);
 
     if (_options.cb !== null) {
       _options.cb(_response);
@@ -158,7 +144,7 @@ DrivePass.GoogleSpreadsheet = (function() {
         message: 'update successful'
       };
     }
-    DrivePass.Signal.broadcast('gs_data_updated', _response);
+    //DrivePass.Signal.broadcast('gs_data_updated', _response);
 
     if (_options.cb !== null) {
       _options.cb(_response);
@@ -180,7 +166,7 @@ DrivePass.GoogleSpreadsheet = (function() {
       };
       _response.queryData = JSON.parse(response);
     }
-    DrivePass.Signal.broadcast('gs_data_query', _response);
+    //DrivePass.Signal.broadcast('gs_data_query', _response);
 
     if (_options.cb !== null) {
       _options.cb(_response);

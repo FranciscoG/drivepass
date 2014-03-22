@@ -11,6 +11,7 @@
   "node": true,
   "sub": true,
   "undef": true,
+  "indent": 2,
   "globals": {
     "DrivePass" : true,
     "chrome" : true,

@@ -5,7 +5,7 @@ var gulp = require('gulp'),
   jshint = require('gulp-jshint'),
   stylish = require('jshint-stylish'),
   streamqueue = require('streamqueue'),
-  open = require('gulp-open');
+  _open = require('gulp-open');
 
 var libs = "src/libs/*.js";
 var modules = "src/modules/*.js";
@@ -87,7 +87,7 @@ gulp.task("reload_chrome_extension", function() {
     app: "google-chrome"
   };
   gulp.src("./index.html")
-    .pipe(open("", options));
+    .pipe(_open("", options));
   return console.log(timestamp());
 });
 // A file must be specified as the src when running options.url or gulp will overlook the task.

@@ -20,11 +20,7 @@
   };
 
   var isUsernameInput = function(node) {
-    if (/signin|email|login|username|usr/gi.test(node.id) && node.type === "text" && !node.disabled && node.style.display !== 'none') {
-      return true;
-    } else {
-      return false;
-    }
+    return (/signin|email|login|username|usr/gi.test(node.id) && node.type === "text" && !node.disabled && node.style.display !== 'none') ? true : false;
   };
 
   /* Not sure if I'm going to use this in the end, might not be necessary
@@ -59,7 +55,7 @@
   // get all inputs
   var filterInputs = function() {
     var nodes = document.getElementsByTagName('input');
-    // grab all inputs and find all that are type=password ot text
+    // grab all inputs and find all that are type=password or text
     for (var i = 0; i < nodes.length; i++) {
       if (nodes[i].type === "password") {
         passwordInput.push(nodes[i]);

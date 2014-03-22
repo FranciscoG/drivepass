@@ -11,8 +11,7 @@ DrivePass.Popup = (function() {
     $add = document.getElementById('add'),
     $update = document.getElementById('update'),
     $theInfo = document.getElementById('theInfo'),
-    $hiddenSite = document.getElementById('hdnSite'),
-    filteredData = JSON.parse(localStorage.getItem('_data')),
+    $currSite = document.getElementById('currSite'),
     fullData = JSON.parse(localStorage.getItem('_full')),
     activeUrl;
 
@@ -39,15 +38,16 @@ DrivePass.Popup = (function() {
    * @param  {object} result  - json object
    */
   var onSuccess = function(result) {
+    console.log(result);
     $loading.style.display = "none";
     handleStatus('success', 'password found');
-    $un.textContent = utils.encodeHTML(result[0]);
-    $pw.textContent = utils.encodeHTML(result[1]);
-    $hiddenSite.value = utils.encodeHTML(result[2]);
+    $un.textContent = utils.encodeHTML(result.username);
+    $pw.textContent = utils.encodeHTML(result.password);
+    $currSite.textContent = utils.encodeHTML(result.site);
 
     DrivePass.Browser.sendToPage({
-      username: result[0],
-      password: result[1]
+      username: result.username,
+      password: result.password
     });
 
     $add.classList.remove('show');
@@ -76,7 +76,7 @@ DrivePass.Popup = (function() {
           handleStatus('error', result.message);
         } else {
           handleStatus('success', result.message);
-          resetLocal();
+          DrivePass.ResetLocal().init();
         }
       });
     }, false);
@@ -84,7 +84,7 @@ DrivePass.Popup = (function() {
 
   var bindUpdate = function() {
     $update.addEventListener('click', function(evt) {
-      var _site = $hiddenSite.value;
+      var _site = $currSite.textContent;
       var entry = findEntry(_site);
       var un = document.getElementById('un').textContent;
       var pw = document.getElementById('pw').textContent;
@@ -94,14 +94,15 @@ DrivePass.Popup = (function() {
           handleStatus('error', result.message);
         } else {
           handleStatus('success', result.message);
-          resetLocal(); // reload sheet after update
+          DrivePass.ResetLocal().init();
         }
       });
     }, false);
   };
 
   /**
-   * Get Object key that matches site name, used when updating information
+   * Get Object key that matches site name, used when updating information.  Updating a row in a Google Spreadsheet
+   * requires a lot more data from the full JSON response than just the un,pw, and site.
    * @param  {string} site      the website that you're trying to change data for
    * @return {string}           the object key
    */
@@ -116,25 +117,16 @@ DrivePass.Popup = (function() {
 
   var initCb = function() {
     activeUrl = DrivePass.Browser.activeTabUrl.replace('www.', "");
-    var found = DrivePass.Password.findPW(filteredData, activeUrl);
-    if (found.length !== 3) {
+
+    var found = DrivePass.DB({
+      site: activeUrl
+    }).get();
+
+    if (found.length === 0) {
       pwNotFound();
     } else {
-      onSuccess(found);
+      onSuccess(found[0]);
     }
-  };
-
-  var resetLocal = function(cb) {
-    Sheet.load(function(response_data) {
-      localStorage.setItem('_full', JSON.stringify(response_data));
-      if (response_data.success === true) {
-        filteredData = DrivePass.Password.filterResults(response_data.sheetData);
-        localStorage.setItem('_data', JSON.stringify(filteredData));
-        if (typeof cb === "function") {
-          cb();
-        }
-      }
-    });
   };
 
   var init = function() {
@@ -143,9 +135,12 @@ DrivePass.Popup = (function() {
      */
     if (!localStorage['sheet_url'] || localStorage['sheet_url'] === "") {
       handleStatus('error', "no spreadsheet set in options");
+      chrome.tabs.create({
+        url: "options.html"
+      });
     } else {
-      if (filteredData === null || fullData === null) {
-        resetLocal(function() {
+      if (fullData === null) {
+        DrivePass.ResetLocal().init(function() {
           DrivePass.Browser.getActiveTab(initCb);
         });
       } else {
@@ -157,7 +152,6 @@ DrivePass.Popup = (function() {
   };
 
   return {
-    init: init,
-    resetLocal: resetLocal
+    init: init
   };
 });

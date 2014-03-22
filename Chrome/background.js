@@ -38,15 +38,18 @@ if (!localStorage['sheet_url'] || localStorage['sheet_url'] === "") {
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (sender.url === sender.tab.url && request.method === "getPW") {
-    var _data = localStorage.getItem('_data');
-    if (_data !== null) {
+    if (DrivePass.DB().get().length > 0) {
       var tabUrl = utils.getHostname(sender.url);
-      var deets = DrivePass.Password.findPW(JSON.parse(_data), tabUrl);
-      sendResponse({
-        username: deets[0],
-        password: deets[1],
-        url: sender.url
-      });
+      var deets = DrivePass.DB({
+        site: tabUrl.replace('www.', "")
+      }).get();
+      if (deets.length > 0) {
+        sendResponse({
+          username: deets[0].username,
+          password: deets[0].password,
+          url: sender.url
+        });
+      }
     }
   }
 });
@@ -63,23 +66,29 @@ function contextMenusOnclick(arg1, arg2) {
       break;
     case "gotodb":
       console.log('open DB');
-      chrome.tabs.create({
-        url: localStorage['sheet_url']
-      });
+      if (typeof localStorage.sheet_url === 'undefined') {
+        chrome.tabs.create({
+          url: "options.html"
+        });
+      } else {
+        chrome.tabs.create({
+          url: localStorage['sheet_url']
+        });
+      }
       break;
   }
 }
 
-chrome.contextMenus.create({
-  "title": "refresh local data",
-  "contexts": ["all"],
-  "id": "refresh"
-}, function() {
-  if (chrome.extension.lastError) {
-    console.log("contextmenu error: " + chrome.extension.lastError.message);
-  }
-});
-if (localStorage['sheet_url'] || localStorage['sheet_url'] !== "") {
+chrome.runtime.onInstalled.addListener(function() {
+  chrome.contextMenus.create({
+    "title": "refresh local data",
+    "contexts": ["all"],
+    "id": "refresh"
+  }, function() {
+    if (chrome.extension.lastError) {
+      console.log("contextmenu error: " + chrome.extension.lastError.message);
+    }
+  });
   chrome.contextMenus.create({
     "title": "open spreadsheet",
     "contexts": ["all"],
@@ -89,5 +98,5 @@ if (localStorage['sheet_url'] || localStorage['sheet_url'] !== "") {
       console.log("contextmenu error: " + chrome.extension.lastError.message);
     }
   });
-}
+});
 chrome.contextMenus.onClicked.addListener(contextMenusOnclick);
