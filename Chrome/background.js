@@ -72,7 +72,7 @@ function contextMenusOnclick(arg1, arg2) {
         });
       } else {
         chrome.tabs.create({
-          url: localStorage['sheet_url']
+          url: "dp_user.html"
         });
       }
       break;

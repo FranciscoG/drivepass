@@ -46,6 +46,10 @@ DrivePass.ext = new DrivePass.Router({
 
   chrome_options: function() {
     new DrivePass.Options();
+  },
+
+  user: function() {
+    new DrivePass.User().init();
   }
 
 });

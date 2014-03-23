@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "DrivePass",
   "description": "This extension fetches a password from a google spreadsheet using oAuth and the Google Drive api",
-  "icons": { 
+  "icons": {
     "16": "img/drive-pass16.png",
     "48": "img/drive-pass48.png",
     "128": "img/drive-pass128.png"
@@ -26,22 +26,20 @@
     "contextMenus"
   ],
   "requirements": {
-      "plugins": {
-         "npapi": false
-      }
-   },
-  "content_scripts": [
-    {
-      "all_frames": true,
-      "js": ["js/contentscript.js"],
-      "matches": ["http://*/*", "https://*/*"],
-      "run_at": "document_end"
+    "plugins": {
+      "npapi": false
     }
-  ],
+  },
+  "content_scripts": [{
+    "all_frames": true,
+    "js": ["js/contentscript.js"],
+    "matches": ["http://*/*", "https://*/*"],
+    "run_at": "document_end"
+  }],
   // http://developer.chrome.com/extensions/contentSecurityPolicy
   // http://www.html5rocks.com/en/tutorials/security/content-security-policy/
   "content_security_policy": "default-src 'none'; script-src 'self' https://spreadsheets.google.com; connect-src https://spreadsheets.google.com; img-src 'self'; style-src 'self'",
-  "web_accessible_resources":[
+  "web_accessible_resources": [
     "chrome_ex_oauth.html"
   ]
 }

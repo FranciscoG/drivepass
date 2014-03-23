@@ -17,6 +17,8 @@
     "chrome" : true,
     "utils" : true,
     "_" : true,
-    "TAFFY" : true
+    "TAFFY" : true,
+    "Backbone": true,
+    "jBone": true
   }
 }
