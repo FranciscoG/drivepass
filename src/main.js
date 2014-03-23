@@ -12,6 +12,9 @@ DrivePass.ext = new DrivePass.Router({
       columns: ['site', 'username', 'password']
     };
 
+    DrivePass.Sheet = new DrivePass.GoogleSpreadsheet();
+    DrivePass.Sheet.init(DrivePass.Settings.gs_sheet_init);
+
     if (typeof localStorage.taffy_tdb !== 'undefined') {
       DrivePass.DB = TAFFY().store('tdb');
     } else if (typeof localStorage._full !== 'undefined') {

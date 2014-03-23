@@ -15,8 +15,7 @@ DrivePass.Popup = (function() {
     fullData = JSON.parse(localStorage.getItem('_full')),
     activeUrl;
 
-  var Sheet = new DrivePass.GoogleSpreadsheet();
-  Sheet.init(DrivePass.Settings.gs_sheet_init);
+  var Sheet = DrivePass.Sheet;
 
   /**
    * Updates the status element ID and displays it
@@ -68,8 +67,8 @@ DrivePass.Popup = (function() {
    */
   var bindAdd = function() {
     $add.addEventListener('click', function(evt) {
-      var un = document.getElementById('un').textContent;
-      var pw = document.getElementById('pw').textContent;
+      var un = $un.textContent;
+      var pw = $pw.textContent;
       var data = [activeUrl, un, pw];
       Sheet.add(data, function(result) {
         if (result.success === false) {
@@ -86,8 +85,8 @@ DrivePass.Popup = (function() {
     $update.addEventListener('click', function(evt) {
       var _site = $currSite.textContent;
       var entry = findEntry(_site);
-      var un = document.getElementById('un').textContent;
-      var pw = document.getElementById('pw').textContent;
+      var un = $un.textContent;
+      var pw = $pw.textContent;
       var data = [_site, un, pw];
       Sheet.update(entry, data, function(result) {
         if (result.success === false) {

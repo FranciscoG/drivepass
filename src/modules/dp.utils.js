@@ -1,7 +1,7 @@
 var utils = {
   /**
    * Add or remove the css class "show" from a DOM element
-   * @param {object}  elm  - A DOM element 
+   * @param {object}  elm  - A DOM element
    */
   toggle: function(elm) {
     if (elm.classList.contains("show")) {
@@ -10,31 +10,31 @@ var utils = {
       elm.classList.add('show');
     }
   },
-  
+
   /**
    * simple toggler to add/remove a class that uses CSS3 transition to show/hide an element
-   * @param  {string}   handler 
+   * @param  {string}   handler
    * @param  {string}   targ
    */
-  toggler: function(handler,targ) {
+  toggler: function(handler, targ) {
     var self = this;
     var elm = document.getElementById(targ);
-    document.getElementById(handler).addEventListener('click',function(e){
+    document.getElementById(handler).addEventListener('click', function(e) {
       self.toggle(elm);
-    },false);
+    }, false);
   },
 
   /**
-    * gets the hostname from a URL string
-    * @param  {string}  a full url
-    * @return {string}
-    */
-  getHostname: function(url){
+   * gets the hostname from a URL string
+   * @param  {string}  a full url
+   * @return {string}
+   */
+  getHostname: function(url) {
     // letting the browser give me the hostname, easier than a regex
     // inspired by: http://stackoverflow.com/a/12470263
     var _url = url || "",
-        a = document.createElement('a');
-    if (_url !== ""){
+      a = document.createElement('a');
+    if (_url !== "") {
       a.href = _url;
       return a.hostname;
     } else {
@@ -47,22 +47,24 @@ var utils = {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   },
 
-  addslashes: function( str ) {
+  addslashes: function(str) {
     return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
   },
 
-  getJSON: function(req_url,yay,bummer) {
+  getJSON: function(req_url, yay, bummer) {
     var data,
-        request = new XMLHttpRequest();
+      request = new XMLHttpRequest();
 
-    var _noCB = function(){ console.log('');};
+    var _noCB = function() {
+      console.log('');
+    };
     var success = (typeof yay === 'function') ? yay : _noCB;
     var fail = (typeof bummer === 'function') ? bummer : _noCB;
-    
+
     request.open('GET', req_url, false);
 
     request.onload = function() {
-      if (request.status >= 200 && request.status < 400){
+      if (request.status >= 200 && request.status < 400) {
         data = JSON.parse(request.responseText);
         success(data);
       } else {
@@ -76,7 +78,30 @@ var utils = {
 
     request.send(null);
   }
+}; // close utils
 
+var Fake$ = function(st) {
+
+  // my simple fake jQuery
+  var about = "this is my minimal fake jQuery";
+
+  if (st) {
+    if (window === this) {
+      return new Fake$(st);
+    }
+
+    var x = st.charAt(0);
+    if (x === "#") {
+      this.el = document.getElementById(st.substring(1));
+    } else if (x === ".") {
+      var nodeList = document.querySelectorAll(st);
+      this.el = Array.prototype.slice.call(nodeList); //to return an array intead of a nodeList
+    } else {
+      this.el = document.getElementById(st);
+    }
+    return this.el;
+  } else {
+    return about;
+  }
 };
-
-
+var $ = Fake$;

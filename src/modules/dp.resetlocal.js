@@ -2,8 +2,7 @@ var DrivePass = DrivePass || {};
 
 DrivePass.ResetLocal = (function() {
 
-  var Sheet = new DrivePass.GoogleSpreadsheet();
-  Sheet.init(DrivePass.Settings.gs_sheet_init);
+  var Sheet = DrivePass.Sheet;
 
   var init = function(cb) {
     Sheet.load(function(response_data) {
