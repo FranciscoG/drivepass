@@ -31,7 +31,7 @@ gulp
 
 Run Gulp Watch while developing to automatically jshint, concat, uglify, and copy files
 ```javascript
-gulp watch
+gulp watch_chrome
 ```
 
 I started off with Grunt and the Gruntfile is still there and operational, but I'm going to stop supporting it so if you want to use Grunt and you start to get errors you might need to tweak it.  If I deviate far enough I'll just remove it completely.
@@ -47,8 +47,6 @@ I started off with Grunt and the Gruntfile is still there and operational, but I
 * more options
 
 * create a new spreadsheet if none exists
-
-* viewing passwords locally
 
 * way down the line, possible FireFox version
 
