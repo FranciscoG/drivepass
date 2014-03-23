@@ -1,0 +1,20 @@
+.container {
+  width:960px;
+}
+#db_container {
+  overflow:hidden;
+}
+
+#db_container .row {
+  width:100%;
+  overflow:hidden;
+  margin:5px 0;
+  border-bottom:1px solid #DED2D2;
+  padding:3px 0;
+}
+
+#db_container div {
+  width: 31%;
+  float: left;
+  padding-right:5px;
+}
