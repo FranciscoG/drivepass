@@ -13,7 +13,8 @@ DrivePass.User = (function() {
 
   var renderView = function() {
     _.each(DrivePass.DB().get(), function(el, i, list) {
-      template(list[i]);
+      html5tmpl('row_template', list[i]).appendTo('db_container');
+      //template(list[i]);
     });
   };
 

@@ -18,7 +18,6 @@
     "utils" : true,
     "_" : true,
     "TAFFY" : true,
-    "Backbone": true,
-    "jBone": true
+    "html5tmpl": true
   }
 }

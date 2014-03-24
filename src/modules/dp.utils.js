@@ -104,4 +104,34 @@ var Fake$ = function(st) {
     return about;
   }
 };
-var $ = Fake$;
+//var $ = Fake$;
+
+/**
+ * mini templating library using native html5 templating
+ * important to note: since html5 templating is basically a wrapper over documentFragment you need to have content nested 1 level deep.
+ * You can't grab innerHTML of the documentFragment itself, but you can for its children.
+ * @param  {string} id       id attribute of the template tag
+ * @param  {object} tmplData data to be added to the template
+ *
+ */
+var html5tmpl = (function(id, tmplData) {
+
+  var template = document.importNode(document.getElementById(id).content, true);
+  var parent = template.children[0];
+  var _tmpl = parent.innerHTML;
+
+  function repl(match, p1, offset, string) {
+    return tmplData[p1];
+  }
+
+  _tmpl = _tmpl.trim().replace(/\{\{(\w+)\}\}/g, repl);
+
+  var render = function(to) {
+    parent.innerHTML = _tmpl;
+    document.getElementById(to).appendChild(parent);
+  };
+
+  return {
+    appendTo: render
+  };
+});
