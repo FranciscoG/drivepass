@@ -51,7 +51,7 @@ DrivePass.ext = new DrivePass.Router({
     new DrivePass.Options();
   },
 
-  user: function() {
+  userDB: function() {
     new DrivePass.User().init();
   }
 
