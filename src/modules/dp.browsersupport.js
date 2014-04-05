@@ -1,6 +1,7 @@
-/* 
+/**
  * This is the funnel for all browser related interactions
- * right now it only handles Chrome, in the futre it will also handle FireFox, maybe Safari too
+ * right now it only handles Chrome, in the future it will also handle FireFox, maybe Safari too
+ * @module DrivePass.BrowserSupport
  */
 
 var DrivePass = DrivePass || {};

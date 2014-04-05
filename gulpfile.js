@@ -5,7 +5,9 @@ var gulp = require('gulp'),
   jshint = require('gulp-jshint'),
   stylish = require('jshint-stylish'),
   streamqueue = require('streamqueue'),
-  _open = require('gulp-open');
+  _open = require('gulp-open'),
+  jsdoc = require("gulp-jsdoc");
+
 
 var libs = "src/libs/*.js";
 var modules = "src/modules/*.js";
@@ -15,6 +17,7 @@ var main = "src/main.js";
 // Global setting to state which browser you are building for
 var buildFor = "Chrome";
 /************************************************************/
+
 function timestamp() {
   var currentdate = new Date();
   var datetime = "Last update: " + currentdate.getDate() + "/" +
@@ -45,6 +48,10 @@ function exportTo(_dest) {
   });
 }
 
+/*
+  Lint only the modules in the src folder
+  TODO: probably also lint background.js and contentscript.js in Chrome folder
+ */
 gulp.task('lint', function() {
   return streamqueue({
       objectMode: true
@@ -56,29 +63,48 @@ gulp.task('lint', function() {
     .pipe(jshint.reporter(stylish));
 });
 
+
+/*
+  Concat only the main router and modules
+ */
 gulp.task('concat', ['lint'], function() {
-  return streamqueue({
+  // concat the modules as is
+  streamqueue({
       objectMode: true
     },
-    gulp.src(libs),
     gulp.src(modules),
     gulp.src(main)
   )
     .pipe(concat('drivepass.js'))
     .pipe(gulp.dest('src/build'));
-});
 
-gulp.task('uglify', ['concat'], function() {
-  gulp.src('src/build/drivepass.js')
+  // concat modules and minify
+  streamqueue({
+      objectMode: true
+    },
+    gulp.src(modules),
+    gulp.src(main)
+  )
     .pipe(uglify({
       outSourceMap: true
     }))
+    .pipe(concat('drivepass.min.js'))
     .pipe(gulp.dest('src/build'));
+
+  // concat the third party libraries separately
+  gulp.src(libs)
+    .pipe(concat('dp.libs.js'))
+    .pipe(gulp.dest('src/build'));
+
 });
 
-gulp.task('export', ['uglify'], function() {
+
+/*
+  move files to destination folder and clean tmp folder
+*/
+gulp.task('export', ['concat'], function() {
   exportTo(buildFor);
-  return console.log(timestamp());
+  console.log(timestamp());
 });
 
 gulp.task("reload_chrome_extension", function() {
@@ -86,12 +112,16 @@ gulp.task("reload_chrome_extension", function() {
     url: "http://reload.extensions",
     app: "google-chrome"
   };
-  gulp.src("./index.html")
-    .pipe(_open("", options));
+  gulp.src("./index.html") // A file must be specified as the src when running options.url or gulp will overlook the task.
+  .pipe(_open("", options));
   return console.log(timestamp());
 });
-// A file must be specified as the src when running options.url or gulp will overlook the task.
 
+
+gulp.task('doc', function() {
+  gulp.src("./src/modules/*.js")
+    .pipe(jsdoc('./doc'));
+});
 
 gulp.task('watch', ['export'], function() {
   gulp.watch(modules, ['export']);
@@ -101,6 +131,7 @@ gulp.task('watch', ['export'], function() {
 });
 
 gulp.task('watch_chrome', ['export'], function() {
+  buildFor = "Chrome";
   gulp.watch(modules, ['export', "reload_chrome_extension"]);
   gulp.watch(main, ['export', "reload_chrome_extension"]);
   gulp.watch('Chrome/background.js', ["reload_chrome_extension"]);
@@ -108,5 +139,6 @@ gulp.task('watch_chrome', ['export'], function() {
   gulp.watch('src/css/*.css', ['export', "reload_chrome_extension"]);
   gulp.watch('src/img/**', ['export', "reload_chrome_extension"]);
 });
+
 
 gulp.task('default', ['export']);

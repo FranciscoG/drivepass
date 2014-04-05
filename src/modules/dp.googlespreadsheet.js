@@ -1,3 +1,8 @@
+/**
+ * A module to use
+ * @module DrivePass.GoogleSpreadsheet
+ */
+
 var DrivePass = DrivePass || {};
 
 DrivePass.GoogleSpreadsheet = (function() {

@@ -117,7 +117,7 @@ var Fake$ = function(st) {
 var html5tmpl = (function(id, tmplData) {
 
   var template = document.importNode(document.getElementById(id).content, true);
-  var parent = template.children[0];
+  var parent = template.children[0]; // grabbing the element that wraps the actual template
   var _tmpl = parent.innerHTML;
 
   function repl(match, p1, offset, string) {

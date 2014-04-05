@@ -21,6 +21,8 @@
     "gulp-jshint": "~1.4.2",
     "jshint-stylish": "~0.1.5",
     "streamqueue": "0.0.4",
-    "gulp-open": "^0.2.8"
+    "gulp-open": "^0.2.8",
+    "gulp-jsdoc": "^0.1.2",
+    "gulp-clean": "^0.2.4"
   }
 }

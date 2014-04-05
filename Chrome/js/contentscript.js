@@ -20,10 +20,12 @@
   };
 
   var isUsernameInput = function(node) {
-    return (/signin|email|login|username|usr/gi.test(node.id) && node.type === "text" && !node.disabled && node.style.display !== 'none') ? true : false;
+    return (/signin|email|login|username|usr/gi.test(node.id) && (node.type === "text" || node.type === "email") && !node.disabled && node.style.display !== 'none') ? true : false;
   };
 
   /* Not sure if I'm going to use this in the end, might not be necessary
+   * I was thinking that I could save input IDs when a user adds/updates so that
+   * instead of parsing through all the inputs I could just select them directly
  
   // Get input IDs on a form submit
   var bindIDgetter = function(elm) {
