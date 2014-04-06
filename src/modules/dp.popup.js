@@ -17,6 +17,14 @@ DrivePass.Popup = (function() {
 
   var Sheet = DrivePass.Sheet;
 
+  // handle UI hide/show elements
+  utils.toggler('showGPoptions', 'gpOptions');
+  utils.toggler('showInfo', 'theInfo');
+  utils.toggler('show_symbols', 'hidden_symbols');
+
+  // init the Password Generator module
+  var generate = new DrivePass.Generator();
+
   /**
    * Updates the status element ID and displays it
    * @param  {string} status
@@ -128,6 +136,7 @@ DrivePass.Popup = (function() {
     }
   };
 
+
   var init = function() {
     /**
      * Shows the options page to the user if they haven't added their spreadsheet url yet
@@ -150,7 +159,18 @@ DrivePass.Popup = (function() {
     }
   };
 
+  var onload = function() {
+    document.addEventListener('DOMContentLoaded', function(e) {
+      if (this.bDone) {
+        return; // deal with DOMContentLoaded being fired twice for some reason
+      }
+      this.bDone = true;
+      generate.init();
+      init();
+    });
+  };
+
   return {
-    init: init
+    init: onload
   };
 });

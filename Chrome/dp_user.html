@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="css/user.css">
   </head>
 
-<body data-route="userDB">
+<body data-route="User" data-action="init">
   <div class="container">
     <header>
       <img src="img/drive-pass128.png" />
@@ -18,9 +18,9 @@
     
     <template id="row_template">
       <div class="row">
-        <div class="site">{{site}}</div>
-        <div class="username">{{username}}</div>
-        <div class="password">{{password}}</div>
+        <a href="http://{{site}}" class="item site" target="_blank">{{site}}</a>
+        <div class="item username" contenteditable="true">{{username}}</div>
+        <div class="item password" contenteditable="true">{{password}}</div>
       </div>
     </template>
 
