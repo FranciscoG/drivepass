@@ -488,6 +488,27 @@ DrivePass.GoogleSpreadsheet = (function() {
   };
 
 });
+/**
+ * Module to handle messaging for all parts of the app.  Create DOM elements and handles UI
+ */
+
+var DrivePass = DrivePass || {};
+
+DrivePass.Notify = (function(type, msg) {
+
+  // create DOM element here
+  var docfrag = document.createDocumentFragment();
+
+  var msg_container = document.createElement('div');
+  msg_container.classList.add('dp_notify', type);
+
+  var msg_textContainer = document.createElement('p');
+
+  msg_textContainer.textContent = msg;
+
+
+
+});
 /*
 https://developers.google.com/drive/v2/reference/
  */
@@ -844,6 +865,8 @@ DrivePass.Router = (function() {
 
     if (typeof ns[controller] === 'function') {
       _controller = new ns[controller]();
+    } else {
+      return;
     }
 
     if (typeof _controller[action] === 'function') {

@@ -50,6 +50,8 @@ I started off with Grunt and the Gruntfile is still there and operational, but I
 
 * way down the line, possible FireFox version
 
+* update logo to comply with Google Drive [branding guidelines](https://developers.google.com/drive/web/branding)
+
 #### Disclaimer  
 This project is a personal work in progress and is nowhere near finished, it's not available in the Chrome App Store. Use it at your own risk, I am not responsible for the security of your information.
 

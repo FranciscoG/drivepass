@@ -25,6 +25,8 @@ DrivePass.Router = (function() {
 
     if (typeof ns[controller] === 'function') {
       _controller = new ns[controller]();
+    } else {
+      return;
     }
 
     if (typeof _controller[action] === 'function') {

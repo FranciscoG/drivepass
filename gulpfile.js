@@ -100,11 +100,10 @@ gulp.task('concat', ['lint'], function() {
 
 
 /*
-  move files to destination folder and clean tmp folder
+  move files to destination folder
 */
 gulp.task('export', ['concat'], function() {
   exportTo(buildFor);
-  console.log(timestamp());
 });
 
 gulp.task("reload_chrome_extension", function() {
@@ -134,8 +133,10 @@ gulp.task('watch_chrome', ['export'], function() {
   buildFor = "Chrome";
   gulp.watch(modules, ['export', "reload_chrome_extension"]);
   gulp.watch(main, ['export', "reload_chrome_extension"]);
+
   gulp.watch('Chrome/background.js', ["reload_chrome_extension"]);
   gulp.watch('Chrome/js/contentscript.js', ["reload_chrome_extension"]);
+
   gulp.watch('src/css/*.css', ['export', "reload_chrome_extension"]);
   gulp.watch('src/img/**', ['export', "reload_chrome_extension"]);
 });

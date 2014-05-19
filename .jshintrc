@@ -18,6 +18,7 @@
     "utils" : true,
     "_" : true,
     "TAFFY" : true,
-    "html5tmpl": true
+    "html5tmpl": true,
+    "sjcl": true
   }
 }
