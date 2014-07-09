@@ -1,6 +1,9 @@
 var DrivePass = DrivePass || {};
 
-DrivePass.Password = (function(sjcl) {
+DrivePass.Sec = (function(sjcl) {
+
+  var fullData = JSON.parse(localStorage.getItem('_full'));
+  var Sheet = DrivePass.Sheet;
 
   sjcl.random.startCollectors();
 
@@ -21,84 +24,39 @@ DrivePass.Password = (function(sjcl) {
     return sjcl.codec.hex.fromBits(x);
   };
 
-  var encrypt = function(key, plaintext) {
-    var response = {};
-    var ct = sjcl.encrypt(key, plaintext, params, response);
-    return response;
+  // take an existing spreadsheet db and encrypt it line by line
+  var convert = function() {
+    // grab full list
+    // loop through
+    // convert just name and password, leave site name
+    // update entry
+
+    // reset local copy when done
+    DrivePass.ResetLocal().init();
   };
 
-  var decrypt = function() {
-
+  var update = function(entry) {
+    var _entry = entry || null;
+    if (_entry === null) {
+      return false;
+    }
+    var _site = "";
+    var un = ""; // encrypt here
+    var pw = ""; // also encrypt
+    var data = [_site, un, pw];
+    Sheet.update(entry, data, function(result) {
+      if (result.success === false) {
+        //
+      } else {
+        //
+      }
+    });
   };
+
 
   return {
     hash: hash,
-    encrypt: encrypt,
-    decrypt: decrypt
+    convert: convert
   };
 
 })(sjcl);
-
-/*
-
-function doPbkdf2(decrypting) {
-  adata: ""
-  ciphertext: ""
-  iter: 1000
-  json: true
-  key: []
-  keysize: "256"
-  mode: "ccm"
-  password: ""
-  plaintext: ""
-  salt: []
-  tag: "64"
-
-
-function doDecrypt() {
-  var v = form.get(),
-    iv = v.iv,
-    key = v.key,
-    adata = v.adata,
-    aes, ciphertext = v.ciphertext,
-    rp = {};
-
-  if (!v.password && !v.key.length) {
-    error("Can't decrypt: need a password or key!");
-    return;
-  }
-
-  if (ciphertext.match("{")) {
-    try {
-      v.plaintext = sjcl.decrypt(v.password || v.key, ciphertext, {}, rp);
-    } catch (e) {
-      error("Can't decrypt: " + e);
-      return;
-    }
-    
-  } else {
-    ciphertext = sjcl.codec.base64.toBits(ciphertext);
-    if (iv.length === 0) {
-      error("Can't decrypt: need an IV!");
-      return;
-    }
-    if (key.length === 0) {
-      if (v.password.length) {
-        doPbkdf2(true);
-        key = v.key;
-      }
-    }
-    aes = new sjcl.cipher.aes(key);
-
-    try {
-      v.plaintext = sjcl.codec.utf8String.fromBits(sjcl.mode[v.mode].decrypt(aes, ciphertext, iv, v.adata, v.tag));
-      v.ciphertext = "";
-      document.getElementById('plaintext').select();
-    } catch (e) {
-      error("Can't decrypt: " + e);
-    }
-  }
-  form.set(v);
-}
-
-*/
