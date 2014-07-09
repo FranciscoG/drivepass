@@ -38,7 +38,7 @@
   }],
   // http://developer.chrome.com/extensions/contentSecurityPolicy
   // http://www.html5rocks.com/en/tutorials/security/content-security-policy/
-  "content_security_policy": "default-src 'none'; script-src 'self' https://spreadsheets.google.com; connect-src https://spreadsheets.google.com; img-src 'self'; style-src 'self'",
+  "content_security_policy": "default-src 'none'; script-src 'self' https://spreadsheets.google.com; connect-src https://*.google.com; img-src 'self'; style-src 'self'",
   "web_accessible_resources": [
     "chrome_ex_oauth.html"
   ]

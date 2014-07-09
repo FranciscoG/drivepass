@@ -20,7 +20,7 @@
   };
 
   var isUsernameInput = function(node) {
-    return (/signin|email|login|username|us(e?)r/gi.test(node.id) && (node.type === "text" || node.type === "email") && !node.disabled && node.style.display !== 'none') ? true : false;
+    return (/signin|email|login|username|us(e?)r(id?)/gi.test(node.id) && (node.type === "text" || node.type === "email") && !node.disabled && node.style.display !== 'none') ? true : false;
   };
 
   /* Not sure if I'm going to use this in the end, might not be necessary

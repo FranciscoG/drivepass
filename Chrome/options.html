@@ -17,34 +17,36 @@
       <p>Please enter a unique name for this browser </p>
       <input type="text" id="appName" />
     </div>
-    <p>
-      Enter a private google spreadsheet URL and press save. 
-      <span class="entypo circled-info" id="inst_link" title="instructions"></span>
-    </p>
-    <div id="instructions" class="hidden">
-        <div>
-        <h3>Instructions</h3>
-        <ol>
-          <li>
-            Make sure you are signed into your Google Account
-          </li>
-          <li>
-            open up <a href="http://drive.google.com" target="_blank">Google Drive</a>.
-          </li>
-          <li>
-            Create a new spreadsheet
-          </li>
-          <li>
-            In the first row enter the following into the first three columns: <br />
-            site, username, password
-          </li>
-          <li>
-            copy and paste the url into the box below and press save, that's it!
-          </li>
-        </ol>
+    <div id="setSheetUrl" class="hidden">
+      <p>
+        Enter a private google spreadsheet URL and press save. 
+        <span class="entypo circled-info" id="inst_link" title="instructions"></span>
+      </p>
+      <div id="instructions" class="hidden">
+          <div>
+          <h3>Instructions</h3>
+          <ol>
+            <li>
+              Make sure you are signed into your Google Account
+            </li>
+            <li>
+              open up <a href="http://drive.google.com" target="_blank">Google Drive</a>.
+            </li>
+            <li>
+              Create a new spreadsheet
+            </li>
+            <li>
+              In the first row enter the following into the first cell of the first three columns: <br />
+              site, username, password
+            </li>
+            <li>
+              copy and paste the url into the box below and press save, that's it!
+            </li>
+          </ol>
+        </div>
       </div>
+      <input type="text" id="sheet_url" name="sheet_url" />
     </div>
-    <input type="text" id="sheet_url" name="sheet_url" />
     <span id="save">Save</span>
     <p id="status"></p>
     <a id="goToSheet">link to sheet</a>

@@ -11,12 +11,21 @@ var oauth,
 /*
  * Chrome Extension oAuth source: http://developer.chrome.com/extensions/tut_oauth
  */
-function onAuthorized() {
-  console.log('authorized');
-}
 
 var app_name = localStorage.getItem('app_name');
+var sheet_url = localStorage.getItem('sheet_url');
 
+function onAuthorized() {
+  if (sheet_url === null || sheet_url === "") {
+    chrome.tabs.create({
+      url: "options.html"
+    });
+  }
+}
+
+/**
+ * Shows the options page to the user if they haven't added their spreadsheet url or app name yet
+ */
 if (app_name === null || app_name === "") {
   chrome.tabs.create({
     url: "options.html"
@@ -25,15 +34,6 @@ if (app_name === null || app_name === "") {
   oauth_config.app_name = "DrivePass Chrome Extension - " + app_name;
   oauth = ChromeExOAuth.initBackgroundPage(oauth_config);
   oauth.authorize(onAuthorized);
-}
-
-/**
- * Shows the options page to the user if they haven't added their spreadsheet url yet
- */
-if (!localStorage['sheet_url'] || localStorage['sheet_url'] === "") {
-  chrome.tabs.create({
-    url: "options.html"
-  });
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
