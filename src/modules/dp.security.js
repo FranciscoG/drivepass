@@ -27,8 +27,14 @@ DrivePass.Password = (function(sjcl) {
     return response;
   };
 
+  var decrypt = function() {
+
+  };
+
   return {
-    hash: hash
+    hash: hash,
+    encrypt: encrypt,
+    decrypt: decrypt
   };
 
 })(sjcl);
