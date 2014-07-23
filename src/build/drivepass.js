@@ -160,6 +160,13 @@ DrivePass.Filters = {
   }
 
 };
+var DrivePass = DrivePass || {};
+
+DrivePass.getMasterPass = function() {
+  var masterPass = "";
+
+  return masterPass;
+};
 /*
   I wanted to be able ot upload a blank spreadsheet for the user but that involves way more
   access and the use of the Google Drive SDK.  I'm going to leave this here but unused for now.
@@ -914,33 +921,49 @@ var DrivePass = DrivePass || {};
 
 DrivePass.Sec = (function(sjcl) {
 
-  sjcl.random.startCollectors();
-
-  var _salt = sjcl.random.randomWords(2, 0);
-
-  var params = {
-    adata: "",
-    iter: 1000,
-    salt: _salt,
-    mode: "ccm",
-    ts: 64,
-    ks: 256
-  };
-
-  var hash = function(password) {
-    var p = sjcl.misc.cachedPbkdf2(password, params);
-    var x = p.key.slice(0, params.ks / 32);
-    return sjcl.codec.hex.fromBits(x);
-  };
+  var fullData = JSON.parse(localStorage.getItem('_full'));
+  var _fullSheet = fullData.sheetData;
+  var Sheet = DrivePass.Sheet;
+  var megaPass = DrivePass.getMasterPass(); // request main password via popup action
 
   // take an existing spreadsheet db and encrypt it line by line
   var convert = function() {
+    var entries = fullData.sheetData.feed.entry;
 
+    for (var _e = 0; _e < entries.length; _e++) {
+      update(entries[_e]);
+    }
+
+    // reset local copy when done
+    DrivePass.ResetLocal().init();
   };
 
+  var update = function(entry) {
+    var _entry = entry || null;
+    if (_entry === null) {
+      return false;
+    }
+    // convert just name and password, leave site name
+    var _site = _entry.gsx$site.$t;
+    var old_login = _entry.gsx$username.$t;
+    var old_pass = _entry.gsx$password.$t;
+
+    var un = "";
+    var pw = "";
+
+    var data = [_site, un, pw];
+    Sheet.update(_entry, data, function(result) {
+      if (result.success === false) {
+        //
+      } else {
+        //
+      }
+    });
+  };
 
   return {
-    hash: hash
+    convert: convert,
+    update: update
   };
 
 })(sjcl);
