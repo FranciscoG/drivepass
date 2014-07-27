@@ -4,7 +4,7 @@ var concat = require('gulp-concat');
 var _open = require('gulp-open');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
-var jsdoc = require("gulp-jsdoc");
+// var jsdoc = require("gulp-jsdoc");
 var rename = require("gulp-rename");
 
 /**********************************************
@@ -55,10 +55,10 @@ gulp.task('minify', ['concat'], function() {
 });
 
 // JSDoc stuff
-gulp.task('doc', function() {
-  gulp.src("./src/modules/*.js")
-    .pipe(jsdoc('./doc'));
-});
+// gulp.task('doc', function() {
+//   gulp.src("./src/modules/*.js")
+//     .pipe(jsdoc('./doc'));
+// });
 
 /**********************************************
  * Move files to current destination folder
@@ -101,7 +101,7 @@ gulp.task("reload_chrome_extension", function() {
     app: "google-chrome"
   };
   return gulp.src("./index.html") // A file must be specified as the src when running options.url or gulp will overlook the task.
-  .pipe(_open("", options));
+    .pipe(_open("", options));
 });
 
 /**********************************************
