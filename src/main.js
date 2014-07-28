@@ -4,19 +4,12 @@ DrivePass.ext = new DrivePass.Router({
 
   universal: function() {
     DrivePass.Settings = JSON.parse(localStorage.getItem('options')) || {};
-    DrivePass.Settings.keeplocal = DrivePass.Settings.keeplocal || true;
     DrivePass.Settings.route = document.body.dataset.route;
-
 
     DrivePass.Settings.gs_sheet_init = {
       sheet_url: localStorage.getItem('sheet_url') || "",
       columns: ['site', 'username', 'password']
     };
-
-    if (localStorage.getItem('sheet_url') !== null) {
-      DrivePass.Sheet = new DrivePass.GoogleSpreadsheet();
-      DrivePass.Sheet.init(DrivePass.Settings.gs_sheet_init);
-    }
 
     if (DrivePass.Settings.gs_sheet_init.sheet_url !== "") {
       DrivePass.Sheet = new DrivePass.GoogleSpreadsheet();

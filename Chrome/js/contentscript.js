@@ -23,37 +23,6 @@
     return (/signin|email|login|username|us(e?)r(id?)/gi.test(node.id) && (node.type === "text" || node.type === "email") && !node.disabled && node.style.display !== 'none') ? true : false;
   };
 
-  /* Not sure if I'm going to use this in the end, might not be necessary
-   * I was thinking that I could save input IDs when a user adds/updates so that
-   * instead of parsing through all the inputs I could just select them directly
- 
-  // Get input IDs on a form submit
-  var bindIDgetter = function(elm) {
-    elm.addEventListener('click', function(e) {
-      var currentForm = e.srcElement.form;
-      var len = currentForm.length;
-      for (var i = 0; i < len; i++) {
-        if (currentForm[i].type === "password") {
-          isGoodForm = true;
-          passwordID = currentForm[i].id;
-          console.log(passwordID);
-        }
-        if (isUsernameInput(currentForm[i])) {
-          isGoodForm = true;
-          usernameID = currentForm[i].id;
-          console.log(usernameID);
-        }
-      }
-    });
-  };
-  var forms = document.getElementsByTagName('form');
-  for (var n = 0; n < forms.length; n++) {
-    if (/search/gi.test(forms[n].id) === false) {
-      bindIDgetter(forms[n]);
-    }
-  }
-  */
-
   // get all inputs
   var filterInputs = function() {
     var nodes = document.getElementsByTagName('input');

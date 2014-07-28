@@ -70,6 +70,16 @@ DrivePass.Popup = (function() {
     utils.toggle($theInfo);
   };
 
+  var doAdd = function(data) {
+    if (data === null) {
+      return;
+    }
+    DrivePass.DB.insert({
+      site: data[0],
+      username: data[1],
+      password: data[2]
+    });
+  };
   /**
    * bind the event listener that handles adding a new entry into the google spreadheet
    */
@@ -89,13 +99,30 @@ DrivePass.Popup = (function() {
     }, false);
   };
 
+  var doUpdate = function(data) {
+    if (data === null) {
+      return;
+    }
+    // for any updates and additions, first grab latest from cloud
+    DrivePass.DB({
+      site: data[0]
+    }).update({
+      username: data[1],
+      password: data[2]
+    });
+  };
+
   var bindUpdate = function() {
     $update.addEventListener('click', function(evt) {
       var _site = $currSite.textContent;
+
       var entry = findEntry(_site);
+
       var un = $un.textContent;
       var pw = $pw.textContent;
       var data = [_site, un, pw];
+
+      // will have to write new update function
       Sheet.update(entry, data, function(result) {
         if (result.success === false) {
           handleStatus('error', result.message);
@@ -104,6 +131,7 @@ DrivePass.Popup = (function() {
           DrivePass.ResetLocal().init();
         }
       });
+
     }, false);
   };
 

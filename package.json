@@ -13,7 +13,6 @@
     "gulp-jshint": "^1.7.0",
     "jshint-stylish": "^0.1.5",
     "gulp-open": "^0.2.8",
-    "gulp-jsdoc": "^0.1.4",
     "gulp-rename": "^1.2.0"
   }
 }

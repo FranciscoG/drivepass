@@ -10,13 +10,23 @@
 <body data-route="Options">
   <div class="container">
     <header>
-      <img src="img/drive-pass128.png" />
+      <img src="img/drive-pass128.png" width="128" height="128" />
       <h1>DrivePass</h1>
     </header>
+
+    <div id="masterPass">
+      <p>
+        Please choose a master password to encrypt your data. Please note that this password is not stored anywhere so you must remember it.
+      </p>
+      <input type="text" id="master_p" name="master_p" />
+      <span id="save_p">Save</span>
+    </div>
+    
     <div id="setAppName" class="hidden">
       <p>Please enter a unique name for this browser </p>
       <input type="text" id="appName" />
     </div>
+    
     <div id="setSheetUrl" class="hidden">
       <p>
         Enter a private google spreadsheet URL and press save. 
@@ -33,11 +43,7 @@
               open up <a href="http://drive.google.com" target="_blank">Google Drive</a>.
             </li>
             <li>
-              Create a new spreadsheet
-            </li>
-            <li>
-              In the first row enter the following into the first cell of the first three columns: <br />
-              site, username, password
+              Create a new spreadsheet, give it a name if you'd like
             </li>
             <li>
               copy and paste the url into the box below and press save, that's it!
@@ -47,6 +53,7 @@
       </div>
       <input type="text" id="sheet_url" name="sheet_url" />
     </div>
+
     <span id="save">Save</span>
     <p id="status"></p>
     <a id="goToSheet">link to sheet</a>
