@@ -4,11 +4,7 @@ var utils = {
    * @param {object}  elm  - A DOM element
    */
   toggle: function(elm) {
-    if (elm.classList.contains("show")) {
-      elm.classList.remove('show');
-    } else {
-      elm.classList.add('show');
-    }
+    elm.classList.toggle('show');
   },
 
   /**

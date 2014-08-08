@@ -708,6 +708,24 @@ DrivePass.Popup = (function() {
   };
 
   /**
+   * Add a new entry to the local TaffyDB
+   * @param  {array} data  array containing 0. Site name, 1. username, 2. password
+   * @return {undefined}
+   */
+  var doAdd = function(data) {
+    if (data === null) {
+      return;
+    }
+    DrivePass.DB.insert({
+      site: data[0],
+      username: data[1],
+      password: data[2]
+    }).callback(function() {
+      DrivePass.ResetLocal().init();
+    });
+  };
+
+  /**
    * bind the event listener that handles adding a new entry into the google spreadheet
    */
   var bindAdd = function() {
@@ -715,32 +733,86 @@ DrivePass.Popup = (function() {
       var un = $un.textContent;
       var pw = $pw.textContent;
       var data = [activeUrl, un, pw];
-      Sheet.add(data, function(result) {
-        if (result.success === false) {
-          handleStatus('error', result.message);
-        } else {
-          handleStatus('success', result.message);
-          DrivePass.ResetLocal().init();
-        }
-      });
+      sheetAdd(data);
     }, false);
+
   };
 
+  /**
+   * Add a new entry into the Google Spreadsheet
+   * @param  {array} data  array containing 0. Site name, 1. username, 2. password
+   * @return {undefined}
+   */
+  var sheetAdd = function(data) {
+    if (data === null) {
+      return;
+    }
+
+    Sheet.add(data, function(result) {
+      if (result.success === false) {
+        handleStatus('error', result.message);
+      } else {
+        handleStatus('success', result.message);
+        DrivePass.ResetLocal().init();
+      }
+    });
+
+  };
+
+  /**
+   * Updates the local TaffyDB information of an existing entry
+   * @param  {array} data  array containing 0. Site name, 1. username, 2. password
+   * @return {undefined}
+   */
+  var doUpdate = function(data) {
+    if (data === null) {
+      return;
+    }
+    // for any updates and additions, first grab latest from cloud
+    DrivePass.DB({
+      site: data[0]
+    }).update({
+      username: data[1],
+      password: data[2]
+    }).callback(function() {
+      DrivePass.ResetLocal().init();
+    });
+  };
+
+  /**
+   * Update the Google Spreadsheet row
+   * @param  {array} data   array containing 0. Site name, 1. username, 2. password
+   * @param  {object} entry  row information from the full JSON response
+   * @return {undefined}
+   */
+  var sheetUpdate = function(data, entry) {
+    if (data === null || entry === null) {
+      return;
+    }
+    Sheet.update(entry, data, function(result) {
+      if (result.success === false) {
+        handleStatus('error', result.message);
+      } else {
+        handleStatus('success', result.message);
+        DrivePass.ResetLocal().init();
+      }
+    });
+  };
+
+  /**
+   * Bind the event listener for updating an entry and grab pertinenet information
+   */
   var bindUpdate = function() {
     $update.addEventListener('click', function(evt) {
       var _site = $currSite.textContent;
+
       var entry = findEntry(_site);
+
       var un = $un.textContent;
       var pw = $pw.textContent;
       var data = [_site, un, pw];
-      Sheet.update(entry, data, function(result) {
-        if (result.success === false) {
-          handleStatus('error', result.message);
-        } else {
-          handleStatus('success', result.message);
-          DrivePass.ResetLocal().init();
-        }
-      });
+
+      sheetUpdate(data, entry);
     }, false);
   };
 
@@ -921,7 +993,53 @@ var DrivePass = DrivePass || {};
 
 DrivePass.Sec = (function(sjcl) {
 
+  var fullData = JSON.parse(localStorage.getItem('_full'));
+  var _fullSheet = fullData.sheetData;
+  var entries = fullData.sheetData.feed.entry;
 
+  var Sheet = DrivePass.Sheet;
+  var megaPass = DrivePass.getMasterPass(); // request main password via popup action
+
+  var __i = 0;
+
+  // take an existing spreadsheet db and encrypt it line by line
+  var convert = function(n) {
+    if (typeof n !== "number") {
+      return;
+    }
+    updateAll(entries[n]);
+  };
+
+  var updateAll = function(entry) {
+    var _entry = entry || null;
+    if (_entry === null) {
+      return false;
+    }
+    // convert just name and password, leave site name
+    var old_site = _entry.gsx$site.$t;
+    var old_login = _entry.gsx$username.$t;
+    var old_pass = _entry.gsx$password.$t;
+
+    var _site = sjcl.encrypt(megaPass, old_site);
+    var un = sjcl.encrypt(megaPass, old_login);
+    var pw = sjcl.encrypt(megaPass, old_pass);
+
+    var data = [_site, un, pw];
+    Sheet.update(_entry, data, function(result) {
+      if (result.success) {
+        __i++;
+        if (__i < entries.length) {
+          convert(__i);
+        }
+      } else {
+        console.error('error saving row for: ' + old_site);
+      }
+    });
+  };
+
+  return {
+    convert: convert
+  };
 
 })(sjcl);
 var DrivePass = DrivePass || {};
@@ -1002,11 +1120,7 @@ var utils = {
    * @param {object}  elm  - A DOM element
    */
   toggle: function(elm) {
-    if (elm.classList.contains("show")) {
-      elm.classList.remove('show');
-    } else {
-      elm.classList.add('show');
-    }
+    elm.classList.toggle('show');
   },
 
   /**
@@ -1145,11 +1259,6 @@ DrivePass.ext = new DrivePass.Router({
       sheet_url: localStorage.getItem('sheet_url') || "",
       columns: ['site', 'username', 'password']
     };
-
-    if (localStorage.getItem('sheet_url') !== null) {
-      DrivePass.Sheet = new DrivePass.GoogleSpreadsheet();
-      DrivePass.Sheet.init(DrivePass.Settings.gs_sheet_init);
-    }
 
     if (DrivePass.Settings.gs_sheet_init.sheet_url !== "") {
       DrivePass.Sheet = new DrivePass.GoogleSpreadsheet();
