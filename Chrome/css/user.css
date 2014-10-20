@@ -1,5 +1,6 @@
 .container {
   width:960px;
+  position: relative;
 }
 #db_container {
   overflow:hidden;
@@ -17,4 +18,14 @@
   width: 31%;
   float: left;
   padding-right:5px;
+}
+
+.search {
+  width: 30%;
+  position: absolute;
+  top: 145px;
+  right: 10px;
+  display: block;
+  padding: 5px 10px;
+  font-size: 20px;
 }

@@ -14,18 +14,22 @@
       <h1>DrivePass</h1>
     </header>
 
-    <div id="db_container"></div>
+    <div id="siteList">
+      <input class="search" placeholder="Filter" autofocus/>
+      
+      <ul class="list" id="db_container"></ul>
+    </div>
     
     <template id="row_template">
-      <div class="row">
+      <li class="row">
         <a href="http://{{site}}" class="item site" target="_blank">{{site}}</a>
         <div class="item username" contenteditable="true">{{username}}</div>
         <div class="item password" contenteditable="true">{{password}}</div>
-      </div>
+      </li>
     </template>
 
   </div>
-  
+
   <script src="js/dp.libs.js"></script>
   <script src="js/drivepass.js"></script>
 </body>

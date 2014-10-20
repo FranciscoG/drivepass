@@ -1106,8 +1106,17 @@ DrivePass.User = (function() {
     });
   };
 
+  var filterSearch = function() {
+    var options = {
+      valueNames: ['site']
+    };
+    var List = window.List;
+    window.userList = new List('siteList', options);
+  };
+
   var init = function() {
     renderView();
+    filterSearch();
   };
 
   return {
