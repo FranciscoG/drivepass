@@ -7,7 +7,7 @@
   },
   "Gruntfile": "Gruntfile.js",
   "devDependencies": {
-    "gulp": "^3.8.5",
+    "gulp": ">=3.8.5",
     "gulp-uglify": "^0.2.1",
     "gulp-concat": "^2.3.0",
     "gulp-jshint": "^1.7.0",
